@@ -39,13 +39,13 @@ func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularPair, pri
 
 	for _, direction := range directions {
 		if direction == consts.DirectionForward {
-			tradePairA := t.cfg.Triangular.Balance * (1 / prices.PairAAsk)
-			tradePairB := tradePairA * (1 / prices.PairBAsk)
+			tradePairA := t.cfg.Triangular.Balance / prices.PairAAsk
+			tradePairB := tradePairA / prices.PairBAsk
 			tradePairC := tradePairB * prices.PairCBid
 
-			tradeWithFeePairA := t.cfg.Triangular.Balance*(1/prices.PairAAsk) - ((t.cfg.Triangular.Balance * (1 / prices.PairAAsk)) * t.cfg.Binance.Fees)
-			tradeWithFeePairB := tradeWithFeePairA*(1/prices.PairBAsk) - ((tradeWithFeePairA * (1 / prices.PairBAsk)) * t.cfg.Binance.Fees)
-			tradeWithFeePairC := tradeWithFeePairB*prices.PairCBid - ((tradeWithFeePairB * prices.PairCBid) * t.cfg.Binance.Fees)
+			tradeWithFeePairA := (t.cfg.Triangular.Balance / prices.PairAAsk) - ((t.cfg.Triangular.Balance / prices.PairAAsk) * t.cfg.Binance.Fees)
+			tradeWithFeePairB := (tradeWithFeePairA / prices.PairBAsk) - ((tradeWithFeePairA / prices.PairBAsk) * t.cfg.Binance.Fees)
+			tradeWithFeePairC := (tradeWithFeePairB * prices.PairCBid) - ((tradeWithFeePairB * prices.PairCBid) * t.cfg.Binance.Fees)
 
 			if tradeWithFeePairC > t.cfg.Triangular.Balance {
 				resp.Direction = consts.DirectionForward
@@ -61,21 +61,21 @@ func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularPair, pri
 		}
 
 		if direction == consts.DirectionReverse {
-			tradePairA := t.cfg.Triangular.Balance * (1 / prices.PairCAsk)
+			tradePairA := t.cfg.Triangular.Balance / prices.PairCAsk
 			tradePairB := tradePairA * prices.PairBBid
 			tradePairC := tradePairB * prices.PairABid
 
-			tradeWithFeePairA := t.cfg.Triangular.Balance*(1/prices.PairCAsk) - ((t.cfg.Triangular.Balance * (1 / prices.PairCAsk)) * t.cfg.Binance.Fees)
-			tradeWithFeePairB := tradeWithFeePairA*prices.PairBBid - ((tradeWithFeePairA * prices.PairBBid) * t.cfg.Binance.Fees)
-			_ = tradeWithFeePairB*prices.PairABid - ((tradeWithFeePairB * prices.PairABid) * t.cfg.Binance.Fees)
+			tradeWithFeePairA := (t.cfg.Triangular.Balance / prices.PairCAsk) - ((t.cfg.Triangular.Balance / prices.PairCAsk) * t.cfg.Binance.Fees)
+			tradeWithFeePairB := (tradeWithFeePairA * prices.PairBBid) - ((tradeWithFeePairA * prices.PairBBid) * t.cfg.Binance.Fees)
+			tradeWithFeePairC := (tradeWithFeePairB * prices.PairABid) - ((tradeWithFeePairB * prices.PairABid) * t.cfg.Binance.Fees)
 
-			if tradePairC > t.cfg.Triangular.Balance {
+			if tradeWithFeePairC > t.cfg.Triangular.Balance {
 				resp.Direction = consts.DirectionReverse
 				resp.PairA = pair.PairC
 				resp.PairB = pair.PairB
 				resp.PairC = pair.PairA
 				resp.QtyPairA = t.cfg.Triangular.Balance
-				resp.QtyPairB = tradePairA
+				resp.QtyPairB = tradePairB
 				resp.QtyPairC = tradePairC
 				resp.FinalBalance = tradePairC
 				return &resp, nil

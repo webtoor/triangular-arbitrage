@@ -126,7 +126,7 @@ func (t *triangular) Start(ctx context.Context) error {
 				if err != nil {
 					return fmt.Errorf("place order error: %v, request %v, raw_response: %v, status_code: %v", err, order, respOrder.RawResponse(), respOrder.Code)
 				}
-				logger.InfoWithContext(ctx, fmt.Sprintf("success request: %v, response: %v", order, respOrder.RawResponse()), lf...)
+				logger.InfoWithContext(ctx, fmt.Sprintf("success place order, raw_request: %v", util.ToJSON(order)), lf...)
 			}
 		}
 	}

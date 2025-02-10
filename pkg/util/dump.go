@@ -95,3 +95,8 @@ func ToJSONMinify(v interface{}) []byte {
 	json.Compact(&buff, b)
 	return buff.Bytes()
 }
+
+func ToJSON(v any) string {
+	r, _ := json.Marshal(v)
+	return string(r)
+}

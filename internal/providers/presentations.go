@@ -10,9 +10,9 @@ type TickerPrices struct {
 }
 
 type PlaceOrderRequest struct {
-	Symbol      string  `json:"symbol"`
-	Side        string  `json:"side"`
-	Type        string  `json:"type"`
-	TimeInForce string  `json:"timeInForce"`
-	Quantity    float64 `json:"quantity"`
+	Symbol      string  `json:"symbol,omitempty"`
+	Side        string  `json:"side,omitempty"`
+	Type        string  `json:"type,omitempty"`
+	TimeInForce string  `json:"timeInForce,omitempty"`
+	Quantity    float64 `json:"quantity,omitempty"`
 }
