@@ -3,6 +3,7 @@ package triangular
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/webtoor/triangular-arbitrage/internal/appctx"
 	"github.com/webtoor/triangular-arbitrage/internal/arbitrage"
@@ -26,6 +27,10 @@ func New(cfg *appctx.Config, spot providers.Exchange, arbitrage arbitrage.Resolv
 }
 
 func (t *triangular) Start(ctx context.Context) error {
+	var (
+		tradePairs []arbitrage.TriangularTradeParam
+	)
+
 	resp, err := t.spot.SetExchange(consts.Binance).TickerPrices(ctx)
 
 	if err != nil {
@@ -50,7 +55,16 @@ func (t *triangular) Start(ctx context.Context) error {
 							return err
 						}
 
-						t.arbitrage.Resolve(consts.Binance).Calculate(gCtx, p, resp)
+						rsp, err := t.arbitrage.Resolve(consts.Binance).Calculate(gCtx, p, resp)
+
+						if err != nil {
+							return err
+						}
+
+						if rsp != nil {
+							tradePairs = append(tradePairs, *rsp)
+						}
+
 						return err
 					})
 				}(pair)
@@ -62,6 +76,12 @@ func (t *triangular) Start(ctx context.Context) error {
 	if err := g.Wait(); err != nil {
 		return err
 	}
+
+	sort.Slice(tradePairs, func(i, j int) bool {
+		return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
+	})
+
+	fmt.Println(tradePairs)
 
 	return nil
 }

@@ -282,5 +282,5 @@ func SubstringAfter(src string, prefix string) string {
 		return src
 	}
 
-	return src[adjustedPos:len(src)]
+	return src[adjustedPos:]
 }

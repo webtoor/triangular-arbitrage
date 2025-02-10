@@ -19,6 +19,6 @@ func (n *noop) PriceByTradingPair(ctx context.Context, pair appctx.TriangularPai
 	return PriceByTradingPairResp{}, fmt.Errorf("invalid exchange")
 }
 
-func (n *noop) Calculate(ctx context.Context, pair appctx.TriangularPair, prices PriceByTradingPairResp) error {
-	return fmt.Errorf("invalid exchange")
+func (n *noop) Calculate(ctx context.Context, pair appctx.TriangularPair, prices PriceByTradingPairResp) (*TriangularTradeParam, error) {
+	return &TriangularTradeParam{}, fmt.Errorf("invalid exchange")
 }
