@@ -2,6 +2,7 @@ package triangular
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sort"
 
@@ -9,7 +10,8 @@ import (
 	"github.com/webtoor/triangular-arbitrage/internal/arbitrage"
 	"github.com/webtoor/triangular-arbitrage/internal/consts"
 	"github.com/webtoor/triangular-arbitrage/internal/providers"
-	"github.com/webtoor/triangular-arbitrage/internal/providers/binance"
+	"github.com/webtoor/triangular-arbitrage/pkg/logger"
+	"github.com/webtoor/triangular-arbitrage/pkg/util"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -30,6 +32,9 @@ func New(cfg *appctx.Config, spot providers.Exchange, arbitrage arbitrage.Resolv
 func (t *triangular) Start(ctx context.Context) error {
 	var (
 		tradePairs []arbitrage.TriangularTradeParam
+		lf         = logger.NewFields(
+			logger.EventName("Triangular.Start"),
+		)
 	)
 
 	resp, err := t.spot.SetExchange(consts.Binance).TickerPrices(ctx)
@@ -78,21 +83,54 @@ func (t *triangular) Start(ctx context.Context) error {
 		return err
 	}
 
-	sort.Slice(tradePairs, func(i, j int) bool {
-		return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
-	})
+	if len(tradePairs) > 0 {
+		t.cfg.Binance.TriangularEnabled = false
 
-	//fmt.Println(tradePairs)
+		sort.Slice(tradePairs, func(i, j int) bool {
+			return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
+		})
 
-	respOrder, err := t.spot.SetExchange(consts.Binance).PlaceOrder(ctx, binance.PlaceOrderRequest{
-		Symbol:      "BTCUSDT",
-		Side:        "BUY",
-		Type:        "MARKET",
-		TimeInForce: "FOK",
-		Quantity:    1000,
-	})
+		x, _ := json.Marshal(tradePairs[0])
 
-	fmt.Println(respOrder, err)
+		fmt.Println(string(x))
 
+		if t.cfg.Binance.TradeEnabled {
+			trade := []providers.PlaceOrderRequest{
+				{
+					Symbol:   tradePairs[0].PairA,
+					Side:     consts.BinanceSideBuy,
+					Type:     consts.BinanceTypeMarket,
+					Quantity: tradePairs[0].QtyPairA,
+				},
+				{
+					Symbol: tradePairs[0].PairB,
+					Side: func() string {
+						if tradePairs[0].Direction == consts.DirectionReverse {
+							return consts.BinanceSideSell
+						}
+						return consts.BinanceSideBuy
+					}(),
+					Type:     consts.BinanceTypeMarket,
+					Quantity: util.Round(tradePairs[0].QtyPairB, 8),
+				},
+				{
+					Symbol:   tradePairs[0].PairC,
+					Side:     consts.BinanceSideSell,
+					Type:     consts.BinanceTypeMarket,
+					Quantity: tradePairs[0].QtyPairC,
+				},
+			}
+
+			for _, order := range trade {
+				respOrder, err := t.spot.SetExchange(consts.Binance).PlaceOrder(ctx, order)
+				if err != nil {
+					return fmt.Errorf("place order error: %v, request %v, raw_response: %v, status_code: %v", err, order, respOrder.RawResponse(), respOrder.Code)
+				}
+				logger.InfoWithContext(ctx, fmt.Sprintf("success request: %v, response: %v", order, respOrder.RawResponse()), lf...)
+			}
+		}
+	}
+
+	t.cfg.Binance.TriangularEnabled = true
 	return nil
 }

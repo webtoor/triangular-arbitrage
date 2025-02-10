@@ -45,6 +45,8 @@ type Binance struct {
 	ApiKey              string  `yaml:"api_key" json:"api_key"`
 	SecretKey           string  `yaml:"secret_key" json:"secret_key"`
 	PathTriangularPairs string  `yaml:"path_triangular_pairs" json:"path_triangular_pairs"`
+	TriangularEnabled   bool    `yaml:"triangular_enabled" json:"triangular_enabled"`
+	TradeEnabled        bool    `yaml:"trade_enabled" json:"trade_enabled"`
 	Fees                float64 `yaml:"fees" json:"fees"`
 	BaseUrl             string  `yaml:"base_url" json:"base_url"`
 	PathExchangeInfo    string  `yaml:"path_exchange_info" json:"path_exchange_info"`

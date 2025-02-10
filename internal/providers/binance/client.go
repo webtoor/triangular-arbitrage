@@ -92,11 +92,11 @@ func (p *binance) TickerPrices(ctx context.Context) (appctx.Response, error) {
 func (p *binance) PlaceOrder(ctx context.Context, in any) (appctx.Response, error) {
 	var (
 		resp       = appctx.NewResponse()
-		respBody   = map[string]any{}
+		respBody   map[string]any
 		requestUrl = fmt.Sprintf("%s%s", p.cfg.Binance.BaseUrl, p.cfg.Binance.PathPlaceOrder)
 	)
 
-	param, ok := in.(PlaceOrderRequest)
+	param, ok := in.(providers.PlaceOrderRequest)
 	if !ok {
 		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("invalid parameter")
 	}
@@ -107,8 +107,7 @@ func (p *binance) PlaceOrder(ctx context.Context, in any) (appctx.Response, erro
 	mapParams.Set("symbol", param.Symbol)
 	mapParams.Set("side", param.Side)
 	mapParams.Set("type", fmt.Sprint(param.Type))
-	mapParams.Set("quoteOrderQty", fmt.Sprint(param.Quantity))
-	mapParams.Set("timeInForce", param.TimeInForce)
+	mapParams.Set("quoteOrderQty", fmt.Sprint(float32(param.Quantity)))
 	mapParams.Set("timestamp", fmt.Sprint(timestamp))
 	mapParams.Set("signature", createSign(mapParams, p.cfg.Binance.SecretKey))
 
@@ -142,5 +141,5 @@ func (p *binance) PlaceOrder(ctx context.Context, in any) (appctx.Response, erro
 		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("error: %v", err)
 	}
 
-	return *resp.WithCode(req.Status()).WithData(respBody), nil
+	return *resp.WithCode(req.Status()).WithData(respBody).WithRawResponse(req.String()), nil
 }

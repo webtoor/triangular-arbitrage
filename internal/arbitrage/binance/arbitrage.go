@@ -29,42 +29,61 @@ func New(cfg *appctx.Config, spot providers.Exchange) arbitrage.Triangular {
 func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularPair, prices arbitrage.PriceByTradingPairResp) (*arbitrage.TriangularTradeParam, error) {
 
 	var (
-		resp arbitrage.TriangularTradeParam
+		resp       arbitrage.TriangularTradeParam
+		directions = []string{consts.DirectionForward, consts.DirectionReverse}
 	)
+
 	if prices.PairAAsk == 0 || prices.PairABid == 0 || prices.PairBAsk == 0 || prices.PairBBid == 0 || prices.PairCAsk == 0 || prices.PairCBid == 0 {
 		return nil, nil
 	}
 
-	tradePairA := t.cfg.Triangular.Balance*(1/prices.PairAAsk) - ((t.cfg.Triangular.Balance * (1 / prices.PairAAsk)) * t.cfg.Binance.Fees)
-	tradePairB := tradePairA*(1/prices.PairBAsk) - ((tradePairA * (1 / prices.PairBAsk)) * t.cfg.Binance.Fees)
-	tradePairC := tradePairB*prices.PairCBid - ((tradePairB * prices.PairCBid) * t.cfg.Binance.Fees)
+	for _, direction := range directions {
+		if direction == consts.DirectionForward {
+			tradePairA := t.cfg.Triangular.Balance * (1 / prices.PairAAsk)
+			tradePairB := tradePairA * (1 / prices.PairBAsk)
+			tradePairC := tradePairB * prices.PairCBid
 
-	if tradePairC > t.cfg.Triangular.Balance {
-		resp.Direction = consts.DirectionForward
-		resp.PairA = pair.PairA
-		resp.PairB = pair.PairB
-		resp.PairC = pair.PairC
-		resp.FinalBalance = tradePairC
-		// fmt.Printf("%s - %s:$%v - %s:%v - %s:$%v - startBalance:$%v - endBalance:$%v\n", resp.Direction, pair.PairA, prices.PairAAsk, pair.PairB, prices.PairBAsk, pair.PairC, prices.PairCBid, t.cfg.Triangular.Balance, tradePairC)
-		return &resp, nil
-	}
+			tradeWithFeePairA := t.cfg.Triangular.Balance*(1/prices.PairAAsk) - ((t.cfg.Triangular.Balance * (1 / prices.PairAAsk)) * t.cfg.Binance.Fees)
+			tradeWithFeePairB := tradeWithFeePairA*(1/prices.PairBAsk) - ((tradeWithFeePairA * (1 / prices.PairBAsk)) * t.cfg.Binance.Fees)
+			tradeWithFeePairC := tradeWithFeePairB*prices.PairCBid - ((tradeWithFeePairB * prices.PairCBid) * t.cfg.Binance.Fees)
 
-	tradePairC = t.cfg.Triangular.Balance*(1/prices.PairCAsk) - ((t.cfg.Triangular.Balance * (1 / prices.PairCAsk)) * t.cfg.Binance.Fees)
-	tradePairB = tradePairC*prices.PairBAsk - ((tradePairC * prices.PairBAsk) * t.cfg.Binance.Fees)
-	tradePairA = tradePairB*prices.PairABid - ((tradePairB * prices.PairABid) * t.cfg.Binance.Fees)
+			if tradeWithFeePairC > t.cfg.Triangular.Balance {
+				resp.Direction = consts.DirectionForward
+				resp.PairA = pair.PairA
+				resp.PairB = pair.PairB
+				resp.PairC = pair.PairC
+				resp.QtyPairA = t.cfg.Triangular.Balance
+				resp.QtyPairB = tradePairA
+				resp.QtyPairC = tradePairC
+				resp.FinalBalance = tradePairC
+				return &resp, nil
+			}
+		}
 
-	if tradePairA > t.cfg.Triangular.Balance {
-		resp.Direction = consts.DirectionReverse
-		resp.PairA = pair.PairC
-		resp.PairB = pair.PairB
-		resp.PairC = pair.PairA
-		resp.FinalBalance = tradePairA
-		// fmt.Printf("%s - %s:$%v - %s:%v - %s:$%v - startBalance:$%v - endBalance:$%v\n", resp.Direction, pair.PairC, prices.PairCAsk, pair.PairB, prices.PairBAsk, pair.PairA, prices.PairABid, t.cfg.Triangular.Balance, tradePairA)
-		return &resp, nil
+		if direction == consts.DirectionReverse {
+			tradePairA := t.cfg.Triangular.Balance * (1 / prices.PairCAsk)
+			tradePairB := tradePairA * prices.PairBBid
+			tradePairC := tradePairB * prices.PairABid
+
+			tradeWithFeePairA := t.cfg.Triangular.Balance*(1/prices.PairCAsk) - ((t.cfg.Triangular.Balance * (1 / prices.PairCAsk)) * t.cfg.Binance.Fees)
+			tradeWithFeePairB := tradeWithFeePairA*prices.PairBBid - ((tradeWithFeePairA * prices.PairBBid) * t.cfg.Binance.Fees)
+			_ = tradeWithFeePairB*prices.PairABid - ((tradeWithFeePairB * prices.PairABid) * t.cfg.Binance.Fees)
+
+			if tradePairC > t.cfg.Triangular.Balance {
+				resp.Direction = consts.DirectionReverse
+				resp.PairA = pair.PairC
+				resp.PairB = pair.PairB
+				resp.PairC = pair.PairA
+				resp.QtyPairA = t.cfg.Triangular.Balance
+				resp.QtyPairB = tradePairA
+				resp.QtyPairC = tradePairC
+				resp.FinalBalance = tradePairC
+				return &resp, nil
+			}
+		}
 	}
 
 	return nil, nil
-
 }
 
 func (t *binance) PriceByTradingPair(ctx context.Context, pair appctx.TriangularPair, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {

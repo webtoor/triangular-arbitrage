@@ -8,3 +8,11 @@ type TickerPrices struct {
 	AskPrice  string `json:"askPrice"`
 	AskQty    string `json:"askQty"`
 }
+
+type PlaceOrderRequest struct {
+	Symbol      string  `json:"symbol"`
+	Side        string  `json:"side"`
+	Type        string  `json:"type"`
+	TimeInForce string  `json:"timeInForce"`
+	Quantity    float64 `json:"quantity"`
+}

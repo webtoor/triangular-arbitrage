@@ -28,14 +28,16 @@ func Start() {
 	arb := arbitrage.New()
 	arb.Registry(consts.Binance, arbitragebinance.New(cfg, spot))
 	ctx := context.Background()
+	arbitrageTriangular := triangular.New(cfg, spot, arb)
 
 	for {
 		select {
 		case <-time.After(2 * time.Second):
-			arbitrageTriangular := triangular.New(cfg, spot, arb)
-			err := arbitrageTriangular.Start(ctx)
-			if err != nil {
-				logger.Error(err)
+			if cfg.Binance.TriangularEnabled {
+				err := arbitrageTriangular.Start(ctx)
+				if err != nil {
+					logger.Error(err)
+				}
 			}
 		case <-ctx.Done():
 			fmt.Println("We're done here!")
