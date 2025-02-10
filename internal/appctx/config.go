@@ -49,6 +49,7 @@ type Binance struct {
 	BaseUrl             string  `yaml:"base_url" json:"base_url"`
 	PathExchangeInfo    string  `yaml:"path_exchange_info" json:"path_exchange_info"`
 	PathTickerPrices    string  `yaml:"path_ticker_prices" json:"path_ticker_prices"`
+	PathPlaceOrder      string  `yaml:"path_place_order" json:"path_place_order"`
 	Timeout             int     `yaml:"timeout" json:"timeout"`
 }
 

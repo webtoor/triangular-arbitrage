@@ -67,6 +67,7 @@ const (
 	Vary                          = "Vary"
 	WWWAuthenticate               = "WWW-Authenticate"
 	Connection                    = "Connection"
+	XMBXAPIKEY                    = "X-MBX-APIKEY"
 
 	MediaTypeJSON = "application/json"
 )
