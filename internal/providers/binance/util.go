@@ -3,7 +3,7 @@ package binance
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
 	"net/url"
 )
 
@@ -11,8 +11,7 @@ func computeHmac256(strMessage string, strSecret string) string {
 	key := []byte(strSecret)
 	h := hmac.New(sha256.New, key)
 	h.Write([]byte(strMessage))
-
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func createSign(mapParams url.Values, secretKey string) string {

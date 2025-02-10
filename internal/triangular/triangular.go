@@ -9,6 +9,7 @@ import (
 	"github.com/webtoor/triangular-arbitrage/internal/arbitrage"
 	"github.com/webtoor/triangular-arbitrage/internal/consts"
 	"github.com/webtoor/triangular-arbitrage/internal/providers"
+	"github.com/webtoor/triangular-arbitrage/internal/providers/binance"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -81,7 +82,17 @@ func (t *triangular) Start(ctx context.Context) error {
 		return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
 	})
 
-	fmt.Println(tradePairs)
+	//fmt.Println(tradePairs)
+
+	respOrder, err := t.spot.SetExchange(consts.Binance).PlaceOrder(ctx, binance.PlaceOrderRequest{
+		Symbol:      "BTCUSDT",
+		Side:        "BUY",
+		Type:        "MARKET",
+		TimeInForce: "FOK",
+		Quantity:    1000,
+	})
+
+	fmt.Println(respOrder, err)
 
 	return nil
 }

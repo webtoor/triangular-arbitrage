@@ -108,9 +108,9 @@ func (p *binance) PlaceOrder(ctx context.Context, in any) (appctx.Response, erro
 	mapParams.Set("side", param.Side)
 	mapParams.Set("type", fmt.Sprint(param.Type))
 	mapParams.Set("quoteOrderQty", fmt.Sprint(param.Quantity))
+	mapParams.Set("timeInForce", param.TimeInForce)
 	mapParams.Set("timestamp", fmt.Sprint(timestamp))
-	signature := createSign(mapParams, p.cfg.Binance.SecretKey)
-	mapParams.Set("signature", signature)
+	mapParams.Set("signature", createSign(mapParams, p.cfg.Binance.SecretKey))
 
 	requestUrl += "?"
 	requestUrl += mapParams.Encode()
