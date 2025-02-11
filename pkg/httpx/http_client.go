@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -119,7 +118,7 @@ func Request(option RequestOptions) (Response, error) {
 	rsp.statusCode = result.StatusCode
 
 	// read response body
-	b, err := ioutil.ReadAll(result.Body)
+	b, err := io.ReadAll(result.Body)
 	if result != nil {
 		result.Body.Close()
 	}
