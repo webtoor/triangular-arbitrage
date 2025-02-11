@@ -1,0 +1,40 @@
+app:
+  name: triangular-arbitrage
+  debug: true
+  timezone: "Asia/Jakarta"
+  env: development
+
+logger:
+  name: triangular-arbitrage
+  level: "info"
+
+triangular:
+  exchanges: ["binance", "kucoin"]
+  interval: 5
+  balance: 1000
+
+binance:
+  api_key:
+  secret_key:
+  path_triangular_pairs: "config/binance-pairs.json"
+  triangular_enabled: true
+  trade_enabled: false
+  fees: 0.001
+  base_url: https://api.binance.com
+  path_exchange_info: /api/v3/exchangeInfo
+  path_ticker_prices: /api/v3/ticker/24hr
+  path_place_order: /api/v3/order/test
+  Timeout: 50
+
+kucoin:
+  api_key:
+  secret_key:
+  path_triangular_pairs: "config/kucoin-pairs.json"
+  triangular_enabled: true
+  trade_enabled: false
+  fees: 0.001
+  base_url: https://api.kucoin.com
+  path_symbols: /api/v2/symbols
+  path_ticker_prices: /api/v3/ticker/24hr
+  path_place_order: /api/v3/order/test
+  Timeout: 50

@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"context"
-
+	"github.com/webtoor/triangular-arbitrage/cmd/scheduler"
 	"github.com/webtoor/triangular-arbitrage/internal/appctx"
 	"github.com/webtoor/triangular-arbitrage/internal/arbitrage"
 	arbitragebinance "github.com/webtoor/triangular-arbitrage/internal/arbitrage/binance"
@@ -29,17 +28,7 @@ func Start() {
 	arb := arbitrage.New()
 	arb.Registry(consts.Binance, arbitragebinance.New(cfg, spot))
 	arb.Registry(consts.Kucoin, arbitragekucoin.New(cfg, spot))
-	_ = triangular.New(cfg, spot, arb)
+	arbitrageTriangular := triangular.New(cfg, spot, arb)
 
-	_, err := spot.SetExchange(consts.Kucoin).ExchangeInfo(context.TODO())
-	if err != nil {
-		panic(err)
-	}
-
-	err = arb.Resolve(consts.Kucoin).GenerateTriangularPairs(context.TODO())
-	if err != nil {
-		panic(err)
-	}
-
-	//scheduler.Start(cfg, arbitrageTriangular)
+	scheduler.Start(cfg, arbitrageTriangular)
 }

@@ -33,52 +33,55 @@ func (t *triangular) Start(ctx context.Context) error {
 	var (
 		tradePairs []arbitrage.TriangularTradeParam
 		lf         = logger.NewFields(
-			logger.EventName("triangular.Start"),
+			logger.EventName("ucase.triangular.start"),
 		)
 	)
 
 	for _, exchange := range t.cfg.Triangular.Exchanges {
 
+		if !t.cfg.Binance.TriangularEnabled || !t.cfg.Binance.TradeEnabled {
+			continue
+		}
+
 		resp, err := t.spot.SetExchange(exchange).TickerPrices(ctx)
 
+		lf.Append(logger.Any("exchange", exchange))
 		if err != nil {
-			return fmt.Errorf("get price pairs binance error: %v, raw response: %v, status code: %v", err, resp.RawResponse(), resp.Code)
+			lf.Append(logger.Any("raw_response", resp.RawResponse()))
+			lf.Append(logger.Any("status_code", resp.Code))
+			logger.ErrorWithContext(ctx, fmt.Sprintf("get ticker price pairs error: %v", err), lf...)
+			return err
 		}
 
 		data, ok := resp.Data.([]providers.TickerPrices)
 		if !ok {
+			logger.ErrorWithContext(ctx, "invalid data type", lf...)
 			return fmt.Errorf("invalid data type")
 		}
 
 		g, gCtx := errgroup.WithContext(ctx)
-		for _, exchange := range t.cfg.Triangular.Exchanges {
-			switch exchange {
-			case consts.Binance:
-				for _, pair := range t.cfg.TriangularPairs {
-					func(p appctx.TriangularPair) {
-						g.Go(func() error {
-							resp, err := t.arbitrage.Resolve(consts.Binance).PriceByTradingPair(gCtx, p, data)
+		for _, pair := range t.cfg.TriangularPairs {
+			func(p appctx.TriangularPair) {
+				g.Go(func() error {
+					resp, err := t.arbitrage.Resolve(consts.Binance).PriceByTradingPair(gCtx, p, data)
 
-							if err != nil {
-								return err
-							}
+					if err != nil {
+						return err
+					}
 
-							rsp, err := t.arbitrage.Resolve(consts.Binance).Calculate(gCtx, p, resp)
+					rsp, err := t.arbitrage.Resolve(consts.Binance).Calculate(gCtx, p, resp)
 
-							if err != nil {
-								return err
-							}
+					if err != nil {
+						return err
+					}
 
-							if rsp != nil {
-								tradePairs = append(tradePairs, *rsp)
-							}
+					if rsp != nil {
+						tradePairs = append(tradePairs, *rsp)
+					}
 
-							return err
-						})
-					}(pair)
-				}
-			}
-
+					return err
+				})
+			}(pair)
 		}
 
 		if err := g.Wait(); err != nil {
@@ -86,7 +89,14 @@ func (t *triangular) Start(ctx context.Context) error {
 		}
 
 		if len(tradePairs) > 0 {
-			t.cfg.Binance.TriangularEnabled = false
+
+			if exchange == consts.Binance {
+				t.cfg.Binance.TriangularEnabled = false
+			}
+
+			if exchange == consts.Kucoin {
+				t.cfg.Kucoin.TriangularEnabled = false
+			}
 
 			sort.Slice(tradePairs, func(i, j int) bool {
 				return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
@@ -126,14 +136,21 @@ func (t *triangular) Start(ctx context.Context) error {
 				for _, order := range trade {
 					respOrder, err := t.spot.SetExchange(exchange).PlaceOrder(ctx, order)
 					if err != nil {
-						return fmt.Errorf("place order error: %v, request %v, raw_response: %v, status_code: %v", err, order, respOrder.RawResponse(), respOrder.Code)
+						return fmt.Errorf("%s place order error: %v, request %v, raw_response: %v, status_code: %v", exchange, err, order, respOrder.RawResponse(), respOrder.Code)
 					}
-					logger.InfoWithContext(ctx, fmt.Sprintf("success place order, raw_request: %v", util.ToJSON(order)), lf...)
+					logger.InfoWithContext(ctx, fmt.Sprintf("%s success place order, raw_request: %v", exchange, util.ToJSON(order)), lf...)
 				}
 			}
 		}
 
-		t.cfg.Binance.TriangularEnabled = true
+		if exchange == consts.Binance {
+			t.cfg.Binance.TriangularEnabled = true
+		}
+
+		if exchange == consts.Kucoin {
+			t.cfg.Kucoin.TriangularEnabled = true
+		}
 	}
+
 	return nil
 }
