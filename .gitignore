@@ -1,2 +1,3 @@
 config/app.yaml
 config/binance-pairs.json
+config/kucoin-pairs.json

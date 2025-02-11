@@ -110,9 +110,9 @@ func (t *binance) GenerateTriangularPairs(ctx context.Context) error {
 
 	symbols := common.TradableSymbols(resp.Data)
 
-	pair_a := fmt.Sprintf("%s%s", t.cfg.Triangular.ABase, t.cfg.Triangular.AQuote)
-	a_base := t.cfg.Triangular.ABase
-	a_quote := t.cfg.Triangular.AQuote
+	pair_a := fmt.Sprintf("%s%s", consts.ABaseBTC, consts.AQuoteUSDT)
+	a_base := consts.ABaseBTC
+	a_quote := consts.AQuoteUSDT
 
 	for range symbols {
 		a_pair_box := []string{a_base, a_quote}

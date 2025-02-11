@@ -20,6 +20,7 @@ type Config struct {
 	TriangularPairs []TriangularPair
 	Logger          Logging `yaml:"logger" json:"logger"`
 	Binance         Binance `yaml:"binance" json:"binance"`
+	Kucoin          Kucoin  `yaml:"kucoin" json:"kucoin"`
 }
 
 type Common struct {
@@ -33,8 +34,6 @@ type Triangular struct {
 	Exchanges []string `yaml:"exchanges" json:"exchanges"`
 	Interval  int      `yaml:"interval" json:"interval"`
 	Balance   float64  `yaml:"balance" json:"balance"`
-	ABase     string   `yaml:"a_base" json:"a_base"`
-	AQuote    string   `yaml:"a_quote" json:"a_quote"`
 }
 
 type Logging struct {
@@ -51,6 +50,20 @@ type Binance struct {
 	Fees                float64 `yaml:"fees" json:"fees"`
 	BaseUrl             string  `yaml:"base_url" json:"base_url"`
 	PathExchangeInfo    string  `yaml:"path_exchange_info" json:"path_exchange_info"`
+	PathTickerPrices    string  `yaml:"path_ticker_prices" json:"path_ticker_prices"`
+	PathPlaceOrder      string  `yaml:"path_place_order" json:"path_place_order"`
+	Timeout             int     `yaml:"timeout" json:"timeout"`
+}
+
+type Kucoin struct {
+	ApiKey              string  `yaml:"api_key" json:"api_key"`
+	SecretKey           string  `yaml:"secret_key" json:"secret_key"`
+	PathTriangularPairs string  `yaml:"path_triangular_pairs" json:"path_triangular_pairs"`
+	TriangularEnabled   bool    `yaml:"triangular_enabled" json:"triangular_enabled"`
+	TradeEnabled        bool    `yaml:"trade_enabled" json:"trade_enabled"`
+	Fees                float64 `yaml:"fees" json:"fees"`
+	BaseUrl             string  `yaml:"base_url" json:"base_url"`
+	PathSymbols         string  `yaml:"path_symbols" json:"path_symbols"`
 	PathTickerPrices    string  `yaml:"path_ticker_prices" json:"path_ticker_prices"`
 	PathPlaceOrder      string  `yaml:"path_place_order" json:"path_place_order"`
 	Timeout             int     `yaml:"timeout" json:"timeout"`
