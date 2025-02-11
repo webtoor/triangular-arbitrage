@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"context"
-	"fmt"
-	"time"
-
+	"github.com/webtoor/triangular-arbitrage/cmd/scheduler"
 	"github.com/webtoor/triangular-arbitrage/internal/appctx"
 	"github.com/webtoor/triangular-arbitrage/internal/arbitrage"
 	arbitragebinance "github.com/webtoor/triangular-arbitrage/internal/arbitrage/binance"
@@ -27,22 +24,7 @@ func Start() {
 
 	arb := arbitrage.New()
 	arb.Registry(consts.Binance, arbitragebinance.New(cfg, spot))
-	ctx := context.Background()
 	arbitrageTriangular := triangular.New(cfg, spot, arb)
 
-	for {
-		select {
-		case <-time.After(2 * time.Second):
-			if cfg.Binance.TriangularEnabled {
-				err := arbitrageTriangular.Start(ctx)
-				if err != nil {
-					logger.Error(err)
-				}
-			}
-		case <-ctx.Done():
-			fmt.Println("We're done here!")
-			return
-		}
-	}
-
+	scheduler.Start(cfg, arbitrageTriangular)
 }

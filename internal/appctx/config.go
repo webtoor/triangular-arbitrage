@@ -31,6 +31,7 @@ type Common struct {
 
 type Triangular struct {
 	Exchanges []string `yaml:"exchanges" json:"exchanges"`
+	Interval  int      `yaml:"interval" json:"interval"`
 	Balance   float64  `yaml:"balance" json:"balance"`
 	ABase     string   `yaml:"a_base" json:"a_base"`
 	AQuote    string   `yaml:"a_quote" json:"a_quote"`
