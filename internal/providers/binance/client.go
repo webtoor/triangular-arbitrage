@@ -22,7 +22,7 @@ func New(cfg *appctx.Config) providers.SpotAPI {
 	}
 }
 
-func (p *binance) ExchangeInfo(ctx context.Context) (appctx.Response, error) {
+func (p *binance) GetAllSymbols(ctx context.Context) (appctx.Response, error) {
 	var (
 		resp     = appctx.NewResponse()
 		respBody = AllSymbolsResponse{}

@@ -104,12 +104,18 @@ func NewConfig() *Config {
 			log.Fatal(err)
 		}
 
-		tp, err := readPairs("binance-pairs.json", fpath...)
+		binance, err := readBinancePairs("binance-pairs.json", fpath...)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		c.TriangularBinancePairs = tp
+		kucoin, err := readKucoinPairs("kucoin-pairs.json", fpath...)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		c.TriangularBinancePairs = binance
+		c.TriangularKucoinPairs = kucoin
 		_cfg = c
 	})
 
@@ -137,8 +143,29 @@ func readCfg(fname string, ps ...string) (*Config, error) {
 	return cfg, nil
 }
 
-func readPairs(fname string, ps ...string) ([]TriangularBinancePair, error) {
+func readBinancePairs(fname string, ps ...string) ([]TriangularBinancePair, error) {
 	var tp []TriangularBinancePair
+	var errs []error
+
+	for _, p := range ps {
+		f := fmt.Sprint(p, fname)
+		err := file.ReadFromJSON(f, &tp)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("file %s error %s", f, err.Error()))
+			continue
+		}
+		break
+	}
+
+	if tp == nil {
+		return nil, fmt.Errorf("file triangular pairs parse error %v", errs)
+	}
+
+	return tp, nil
+}
+
+func readKucoinPairs(fname string, ps ...string) ([]TriangularKucoinPair, error) {
+	var tp []TriangularKucoinPair
 	var errs []error
 
 	for _, p := range ps {

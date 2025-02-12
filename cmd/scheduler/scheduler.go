@@ -9,7 +9,7 @@ import (
 	"github.com/webtoor/triangular-arbitrage/internal/triangular"
 )
 
-func Start(cfg *appctx.Config, t triangular.Resolve) {
+func Start(cfg *appctx.Config, t triangular.Resolverer) {
 	s := gocron.NewScheduler(time.Local)
 
 	s.Every(cfg.Triangular.Interval).Second().Do(func() {

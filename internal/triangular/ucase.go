@@ -20,7 +20,7 @@ type triangular struct {
 	arbitrage arbitrage.Resolverer
 }
 
-func New(cfg *appctx.Config, spot providers.Exchange, arbitrage arbitrage.Resolverer) Resolve {
+func New(cfg *appctx.Config, spot providers.Exchange, arbitrage arbitrage.Resolverer) Resolverer {
 	return &triangular{
 		cfg:       cfg,
 		spot:      spot,

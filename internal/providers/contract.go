@@ -13,7 +13,7 @@ type Exchange interface {
 }
 
 type SpotAPI interface {
-	ExchangeInfo(ctx context.Context) (appctx.Response, error)
+	GetAllSymbols(ctx context.Context) (appctx.Response, error)
 	TickerPrices(ctx context.Context) (appctx.Response, error)
 	PlaceOrder(ctx context.Context, in any) (appctx.Response, error)
 }

@@ -2,6 +2,6 @@ package triangular
 
 import "context"
 
-type Resolve interface {
+type Resolverer interface {
 	Start(ctx context.Context) error
 }

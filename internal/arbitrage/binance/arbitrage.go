@@ -113,7 +113,7 @@ func (t *binance) GenerateTriangularPairs(ctx context.Context) error {
 		pairs = []presentations.TriangularCombined{}
 	)
 
-	resp, err := t.spot.SetExchange(consts.Binance).ExchangeInfo(ctx)
+	resp, err := t.spot.SetExchange(consts.Binance).GetAllSymbols(ctx)
 
 	if err != nil {
 		return fmt.Errorf("generate triangular pairs binance error: %v, raw response: %v, status code: %v", err, resp.RawResponse(), resp.Code)

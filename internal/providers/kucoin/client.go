@@ -21,7 +21,7 @@ func New(cfg *appctx.Config) providers.SpotAPI {
 	}
 }
 
-func (p *kucoin) ExchangeInfo(ctx context.Context) (appctx.Response, error) {
+func (p *kucoin) GetAllSymbols(ctx context.Context) (appctx.Response, error) {
 	var (
 		resp     = appctx.NewResponse()
 		respBody = AllSymbolsResponse{}

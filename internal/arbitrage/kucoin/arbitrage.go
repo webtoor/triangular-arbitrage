@@ -56,7 +56,7 @@ func (a *kucoin) GenerateTriangularPairs(ctx context.Context) error {
 		pairs = []presentations.TriangularCombined{}
 	)
 
-	resp, err := a.spot.SetExchange(consts.Kucoin).ExchangeInfo(ctx)
+	resp, err := a.spot.SetExchange(consts.Kucoin).GetAllSymbols(ctx)
 
 	if err != nil {
 		return fmt.Errorf("generate triangular pairs kucoin error: %v, raw response: %v, status code: %v", err, resp.RawResponse(), resp.Code)
