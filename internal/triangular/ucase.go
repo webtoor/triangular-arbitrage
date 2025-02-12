@@ -47,8 +47,8 @@ func (t *triangular) Start(ctx context.Context) error {
 		}
 
 		resp, err := t.spot.SetExchange(exchange).TickerPrices(ctx)
-
 		lf.Append(logger.Any("exchange", exchange))
+
 		if err != nil {
 			lf.Append(logger.Any("raw_response", resp.RawResponse()))
 			lf.Append(logger.Any("status_code", resp.Code))
@@ -70,13 +70,13 @@ func (t *triangular) Start(ctx context.Context) error {
 						resp, err := t.arbitrage.Resolve(consts.Binance).PriceByTradingPair(gCtx, p, data)
 
 						if err != nil {
-							return err
+							return fmt.Errorf("get price by trading pair error: %v", err)
 						}
 
-						rsp, err := t.arbitrage.Resolve(consts.Binance).Calculate(gCtx, p, resp)
+						rsp, err := t.arbitrage.Resolve(consts.Binance).Calculate(gCtx, resp)
 
 						if err != nil {
-							return err
+							return fmt.Errorf("calculate error: %v", err)
 						}
 
 						if rsp != nil {
@@ -96,13 +96,13 @@ func (t *triangular) Start(ctx context.Context) error {
 						resp, err := t.arbitrage.Resolve(consts.Kucoin).PriceByTradingPair(gCtx, p, data)
 
 						if err != nil {
-							return err
+							return fmt.Errorf("get price by trading pair error: %v", err)
 						}
 
-						rsp, err := t.arbitrage.Resolve(consts.Kucoin).Calculate(gCtx, p, resp)
+						rsp, err := t.arbitrage.Resolve(consts.Kucoin).Calculate(gCtx, resp)
 
 						if err != nil {
-							return err
+							return fmt.Errorf("calculate error: %v", err)
 						}
 
 						if rsp != nil {
@@ -116,6 +116,7 @@ func (t *triangular) Start(ctx context.Context) error {
 		}
 
 		if err := g.Wait(); err != nil {
+			logger.ErrorWithContext(ctx, fmt.Sprintf("error: %v", err), lf...)
 			return err
 		}
 
@@ -133,7 +134,6 @@ func (t *triangular) Start(ctx context.Context) error {
 					continue
 				}
 				t.cfg.Kucoin.TriangularEnabled = false
-
 			}
 
 			sort.Slice(tradePairs, func(i, j int) bool {
@@ -171,7 +171,8 @@ func (t *triangular) Start(ctx context.Context) error {
 			for _, order := range trade {
 				respOrder, err := t.spot.SetExchange(exchange).PlaceOrder(ctx, order)
 				if err != nil {
-					return fmt.Errorf("%s place order error: %v, request %v, raw_response: %v, status_code: %v", exchange, err, order, respOrder.RawResponse(), respOrder.Code)
+					logger.ErrorWithContext(ctx, fmt.Sprintf("%s place order error: %v, request %v, raw_response: %v, status_code: %v", exchange, err, order, respOrder.RawResponse(), respOrder.Code), lf...)
+					return err
 				}
 				logger.InfoWithContext(ctx, fmt.Sprintf("%s success place order, raw_request: %v", exchange, util.ToJSON(order)), lf...)
 			}

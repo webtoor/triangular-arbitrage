@@ -26,7 +26,7 @@ func New(cfg *appctx.Config, spot providers.Exchange) arbitrage.Triangular {
 	}
 }
 
-func (a *kucoin) Calculate(ctx context.Context, pair appctx.TriangularBinancePair, prices arbitrage.PriceByTradingPairResp) (*arbitrage.TriangularTradeParam, error) {
+func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingPairResp) (*arbitrage.TriangularTradeParam, error) {
 
 	return nil, nil
 }
@@ -34,6 +34,9 @@ func (a *kucoin) Calculate(ctx context.Context, pair appctx.TriangularBinancePai
 func (a *kucoin) PriceByTradingPair(ctx context.Context, pair appctx.TriangularBinancePair, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
 
 	rsp := arbitrage.PriceByTradingPairResp{}
+	rsp.PairA = pair.PairA
+	rsp.PairB = pair.PairB
+	rsp.PairC = pair.PairC
 	rsp.PairAAsk, rsp.PairABid = arbitrage.ExtractPrice(pair.PairA, in)
 	rsp.PairBAsk, rsp.PairBBid = arbitrage.ExtractPrice(pair.PairB, in)
 	rsp.PairCAsk, rsp.PairCBid = arbitrage.ExtractPrice(pair.PairC, in)

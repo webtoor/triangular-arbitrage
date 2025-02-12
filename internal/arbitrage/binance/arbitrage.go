@@ -26,7 +26,7 @@ func New(cfg *appctx.Config, spot providers.Exchange) arbitrage.Triangular {
 	}
 }
 
-func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularBinancePair, prices arbitrage.PriceByTradingPairResp) (*arbitrage.TriangularTradeParam, error) {
+func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTradingPairResp) (*arbitrage.TriangularTradeParam, error) {
 
 	var (
 		resp       arbitrage.TriangularTradeParam
@@ -48,10 +48,11 @@ func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularBinancePa
 			tradeWithFeePairC := (tradeWithFeePairB * prices.PairCBid) - ((tradeWithFeePairB * prices.PairCBid) * t.cfg.Binance.Fees)
 
 			if tradeWithFeePairC > t.cfg.Triangular.Balance {
+				resp.Exchange = consts.Binance
 				resp.Direction = consts.DirectionForward
-				resp.PairA = pair.PairA
-				resp.PairB = pair.PairB
-				resp.PairC = pair.PairC
+				resp.PairA = prices.PairA
+				resp.PairB = prices.PairB
+				resp.PairC = prices.PairC
 				resp.QtyPairA = t.cfg.Triangular.Balance
 				resp.QtyPairB = tradePairA
 				resp.QtyPairC = tradePairC
@@ -70,10 +71,11 @@ func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularBinancePa
 			tradeWithFeePairC := (tradeWithFeePairB * prices.PairABid) - ((tradeWithFeePairB * prices.PairABid) * t.cfg.Binance.Fees)
 
 			if tradeWithFeePairC > t.cfg.Triangular.Balance {
+				resp.Exchange = consts.Binance
 				resp.Direction = consts.DirectionReverse
-				resp.PairA = pair.PairC
-				resp.PairB = pair.PairB
-				resp.PairC = pair.PairA
+				resp.PairA = prices.PairC
+				resp.PairB = prices.PairB
+				resp.PairC = prices.PairA
 				resp.QtyPairA = t.cfg.Triangular.Balance
 				resp.QtyPairB = tradePairB
 				resp.QtyPairC = tradePairC
@@ -89,6 +91,9 @@ func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularBinancePa
 func (t *binance) PriceByTradingPair(ctx context.Context, pair appctx.TriangularBinancePair, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
 
 	rsp := arbitrage.PriceByTradingPairResp{}
+	rsp.PairA = pair.PairA
+	rsp.PairB = pair.PairB
+	rsp.PairC = pair.PairC
 	rsp.PairAAsk, rsp.PairABid = arbitrage.ExtractPrice(pair.PairA, in)
 	rsp.PairBAsk, rsp.PairBBid = arbitrage.ExtractPrice(pair.PairB, in)
 	rsp.PairCAsk, rsp.PairCBid = arbitrage.ExtractPrice(pair.PairC, in)

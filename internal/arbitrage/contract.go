@@ -16,5 +16,5 @@ type Resolverer interface {
 type Triangular interface {
 	GenerateTriangularPairs(ctx context.Context) error
 	PriceByTradingPair(ctx context.Context, pair appctx.TriangularBinancePair, in []providers.TickerPrices) (PriceByTradingPairResp, error)
-	Calculate(ctx context.Context, pair appctx.TriangularBinancePair, prices PriceByTradingPairResp) (*TriangularTradeParam, error)
+	Calculate(ctx context.Context, prices PriceByTradingPairResp) (*TriangularTradeParam, error)
 }

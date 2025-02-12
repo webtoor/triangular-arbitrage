@@ -1,6 +1,9 @@
 package arbitrage
 
 type PriceByTradingPairResp struct {
+	PairA    string  `json:"pair_a"`
+	PairB    string  `json:"pair_b"`
+	PairC    string  `json:"pair_c"`
 	PairAAsk float64 `json:"pair_a_ask"`
 	PairABid float64 `json:"pair_a_bid"`
 	PairBBid float64 `json:"pair_b_bid"`
@@ -10,6 +13,7 @@ type PriceByTradingPairResp struct {
 }
 
 type TriangularTradeParam struct {
+	Exchange     string  `json:"exchange"`
 	Direction    string  `json:"direction"`
 	PairA        string  `json:"pair_a"`
 	PairB        string  `json:"pair_b"`
