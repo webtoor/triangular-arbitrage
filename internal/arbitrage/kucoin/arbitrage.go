@@ -39,9 +39,6 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 
 	for _, direction := range directions {
 		if direction == consts.DirectionForward {
-			tradePairA := a.cfg.Triangular.Balance / prices.PairAAsk
-			tradePairB := tradePairA / prices.PairBAsk
-			tradePairC := tradePairB * prices.PairCBid
 
 			tradeWithFeePairA := (a.cfg.Triangular.Balance / prices.PairAAsk) - ((a.cfg.Triangular.Balance / prices.PairAAsk) * a.cfg.Binance.Fees)
 			tradeWithFeePairB := (tradeWithFeePairA / prices.PairBAsk) - ((tradeWithFeePairA / prices.PairBAsk) * a.cfg.Binance.Fees)
@@ -53,18 +50,16 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 				resp.PairA = prices.PairA
 				resp.PairB = prices.PairB
 				resp.PairC = prices.PairC
-				resp.QtyPairA = a.cfg.Triangular.Balance
-				resp.QtyPairB = tradePairA
-				resp.QtyPairC = tradePairC
-				resp.FinalBalance = tradePairC
+				resp.QtyPairA = tradeWithFeePairA
+				resp.QtyPairB = tradeWithFeePairB
+				resp.QtyPairC = tradeWithFeePairC
+				resp.InitialFunds = a.cfg.Triangular.Balance
+				resp.FinalFunds = tradeWithFeePairC
 				return &resp, nil
 			}
 		}
 
 		if direction == consts.DirectionReverse {
-			tradePairA := a.cfg.Triangular.Balance / prices.PairCAsk
-			tradePairB := tradePairA * prices.PairBBid
-			tradePairC := tradePairB * prices.PairABid
 
 			tradeWithFeePairA := (a.cfg.Triangular.Balance / prices.PairCAsk) - ((a.cfg.Triangular.Balance / prices.PairCAsk) * a.cfg.Binance.Fees)
 			tradeWithFeePairB := (tradeWithFeePairA * prices.PairBBid) - ((tradeWithFeePairA * prices.PairBBid) * a.cfg.Binance.Fees)
@@ -76,10 +71,11 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 				resp.PairA = prices.PairC
 				resp.PairB = prices.PairB
 				resp.PairC = prices.PairA
-				resp.QtyPairA = a.cfg.Triangular.Balance
-				resp.QtyPairB = tradePairB
-				resp.QtyPairC = tradePairC
-				resp.FinalBalance = tradePairC
+				resp.QtyPairA = tradeWithFeePairA
+				resp.QtyPairB = tradeWithFeePairB
+				resp.QtyPairC = tradeWithFeePairC
+				resp.InitialFunds = a.cfg.Triangular.Balance
+				resp.FinalFunds = tradeWithFeePairC
 				return &resp, nil
 			}
 		}
@@ -90,7 +86,7 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 
 func (a *kucoin) PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
 
-	rsp := arbitrage.PriceByTradingPairResp{}
+	var rsp arbitrage.PriceByTradingPairResp
 
 	data, ok := pair.(appctx.TriangularKucoinPair)
 	if !ok {

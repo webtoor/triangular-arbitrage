@@ -21,5 +21,6 @@ type TriangularTradeParam struct {
 	QtyPairA     float64 `json:"qty_pair_a"`
 	QtyPairB     float64 `json:"qty_pair_b"`
 	QtyPairC     float64 `json:"qty_pair_c"`
-	FinalBalance float64 `json:"final_balance"`
+	InitialFunds float64 `json:"initial_funds"`
+	FinalFunds   float64 `json:"final_funds"`
 }

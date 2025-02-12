@@ -40,3 +40,7 @@ func ToString(value interface{}) string {
 		return fmt.Sprintf("%+v", value)
 	}
 }
+
+func EmptyString() string {
+	return ""
+}

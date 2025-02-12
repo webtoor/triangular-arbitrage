@@ -56,7 +56,8 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 				resp.QtyPairA = t.cfg.Triangular.Balance
 				resp.QtyPairB = tradeWithFeePairA
 				resp.QtyPairC = tradeWithFeePairC
-				resp.FinalBalance = tradeWithFeePairC
+				resp.InitialFunds = t.cfg.Triangular.Balance
+				resp.FinalFunds = tradeWithFeePairC
 				return &resp, nil
 			}
 		}
@@ -79,7 +80,8 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 				resp.QtyPairA = t.cfg.Triangular.Balance
 				resp.QtyPairB = tradeWithFeePairB
 				resp.QtyPairC = tradeWithFeePairC
-				resp.FinalBalance = tradeWithFeePairC
+				resp.InitialFunds = t.cfg.Triangular.Balance
+				resp.FinalFunds = tradeWithFeePairC
 				return &resp, nil
 			}
 		}

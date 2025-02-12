@@ -59,6 +59,7 @@ type Binance struct {
 type Kucoin struct {
 	ApiKey              string  `yaml:"api_key" json:"api_key"`
 	SecretKey           string  `yaml:"secret_key" json:"secret_key"`
+	ApiPassphrase       string  `yaml:"api_passphrase" json:"api_passphrase"`
 	PathTriangularPairs string  `yaml:"path_triangular_pairs" json:"path_triangular_pairs"`
 	TriangularEnabled   bool    `yaml:"triangular_enabled" json:"triangular_enabled"`
 	TradeEnabled        bool    `yaml:"trade_enabled" json:"trade_enabled"`

@@ -146,7 +146,7 @@ func (t *triangular) Start(ctx context.Context) error {
 			}
 
 			sort.Slice(tradePairs, func(i, j int) bool {
-				return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
+				return tradePairs[i].FinalFunds > tradePairs[j].FinalFunds
 			})
 
 			fmt.Println(util.ToJSON(tradePairs[0]))

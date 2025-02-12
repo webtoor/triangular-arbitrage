@@ -116,7 +116,7 @@ func (p *binance) PlaceOrder(ctx context.Context, in any) (appctx.Response, erro
 	requestUrl += mapParams.Encode()
 
 	h := httpx.Headers{}
-	h.Add(httpx.XMBXAPIKEY, p.cfg.Binance.ApiKey)
+	h.Add("X-MBX-APIKEY", p.cfg.Binance.ApiKey)
 
 	reqOption := httpx.RequestOptions{
 		Context: ctx,
