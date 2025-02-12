@@ -15,10 +15,10 @@ func (n *noop) GenerateTriangularPairs(ctx context.Context) error {
 	return fmt.Errorf("invalid exchange")
 }
 
-func (n *noop) PriceByTradingPair(ctx context.Context, pair appctx.TriangularPair, in []providers.TickerPrices) (PriceByTradingPairResp, error) {
+func (n *noop) PriceByTradingPair(ctx context.Context, pair appctx.TriangularBinancePair, in []providers.TickerPrices) (PriceByTradingPairResp, error) {
 	return PriceByTradingPairResp{}, fmt.Errorf("invalid exchange")
 }
 
-func (n *noop) Calculate(ctx context.Context, pair appctx.TriangularPair, prices PriceByTradingPairResp) (*TriangularTradeParam, error) {
+func (n *noop) Calculate(ctx context.Context, pair appctx.TriangularBinancePair, prices PriceByTradingPairResp) (*TriangularTradeParam, error) {
 	return &TriangularTradeParam{}, fmt.Errorf("invalid exchange")
 }

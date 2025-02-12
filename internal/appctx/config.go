@@ -17,7 +17,7 @@ var (
 type Config struct {
 	App             *Common    `yaml:"app" json:"app"`
 	Triangular      Triangular `yaml:"triangular" json:"triangular"`
-	TriangularPairs []TriangularPair
+	TriangularPairs []TriangularBinancePair
 	Logger          Logging `yaml:"logger" json:"logger"`
 	Binance         Binance `yaml:"binance" json:"binance"`
 	Kucoin          Kucoin  `yaml:"kucoin" json:"kucoin"`
@@ -69,7 +69,7 @@ type Kucoin struct {
 	Timeout             int     `yaml:"timeout" json:"timeout"`
 }
 
-type TriangularPair struct {
+type TriangularBinancePair struct {
 	ABase    string `json:"a_base"`
 	AQuote   string `json:"a_quote"`
 	BBase    string `json:"b_base"`
@@ -123,8 +123,8 @@ func readCfg(fname string, ps ...string) (*Config, error) {
 	return cfg, nil
 }
 
-func readPairs(fname string, ps ...string) ([]TriangularPair, error) {
-	var tp []TriangularPair
+func readPairs(fname string, ps ...string) ([]TriangularBinancePair, error) {
+	var tp []TriangularBinancePair
 	var errs []error
 
 	for _, p := range ps {

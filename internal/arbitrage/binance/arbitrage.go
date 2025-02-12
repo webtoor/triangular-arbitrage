@@ -26,7 +26,7 @@ func New(cfg *appctx.Config, spot providers.Exchange) arbitrage.Triangular {
 	}
 }
 
-func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularPair, prices arbitrage.PriceByTradingPairResp) (*arbitrage.TriangularTradeParam, error) {
+func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularBinancePair, prices arbitrage.PriceByTradingPairResp) (*arbitrage.TriangularTradeParam, error) {
 
 	var (
 		resp       arbitrage.TriangularTradeParam
@@ -86,7 +86,7 @@ func (t *binance) Calculate(ctx context.Context, pair appctx.TriangularPair, pri
 	return nil, nil
 }
 
-func (t *binance) PriceByTradingPair(ctx context.Context, pair appctx.TriangularPair, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
+func (t *binance) PriceByTradingPair(ctx context.Context, pair appctx.TriangularBinancePair, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
 
 	rsp := arbitrage.PriceByTradingPairResp{}
 	rsp.PairAAsk, rsp.PairABid = arbitrage.ExtractPrice(pair.PairA, in)
