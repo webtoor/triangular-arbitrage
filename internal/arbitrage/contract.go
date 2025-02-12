@@ -3,7 +3,6 @@ package arbitrage
 import (
 	"context"
 
-	"github.com/webtoor/triangular-arbitrage/internal/appctx"
 	"github.com/webtoor/triangular-arbitrage/internal/providers"
 )
 
@@ -15,6 +14,6 @@ type Resolverer interface {
 
 type Triangular interface {
 	GenerateTriangularPairs(ctx context.Context) error
-	PriceByTradingPair(ctx context.Context, pair appctx.TriangularBinancePair, in []providers.TickerPrices) (PriceByTradingPairResp, error)
+	PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (PriceByTradingPairResp, error)
 	Calculate(ctx context.Context, prices PriceByTradingPairResp) (*TriangularTradeParam, error)
 }

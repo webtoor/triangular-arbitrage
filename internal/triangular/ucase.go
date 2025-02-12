@@ -64,7 +64,7 @@ func (t *triangular) Start(ctx context.Context) error {
 
 		g, gCtx := errgroup.WithContext(ctx)
 		if exchange == consts.Binance {
-			for _, pair := range t.cfg.TriangularPairs {
+			for _, pair := range t.cfg.TriangularBinancePairs {
 				func(p appctx.TriangularBinancePair) {
 					g.Go(func() error {
 						resp, err := t.arbitrage.Resolve(consts.Binance).PriceByTradingPair(gCtx, p, data)
@@ -90,8 +90,8 @@ func (t *triangular) Start(ctx context.Context) error {
 		}
 
 		if exchange == consts.Kucoin {
-			for _, pair := range t.cfg.TriangularPairs {
-				func(p appctx.TriangularBinancePair) {
+			for _, pair := range t.cfg.TriangularKucoinPairs {
+				func(p appctx.TriangularKucoinPair) {
 					g.Go(func() error {
 						resp, err := t.arbitrage.Resolve(consts.Kucoin).PriceByTradingPair(gCtx, p, data)
 

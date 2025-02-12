@@ -31,15 +31,21 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 	return nil, nil
 }
 
-func (a *kucoin) PriceByTradingPair(ctx context.Context, pair appctx.TriangularBinancePair, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
+func (a *kucoin) PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
 
 	rsp := arbitrage.PriceByTradingPairResp{}
-	rsp.PairA = pair.PairA
-	rsp.PairB = pair.PairB
-	rsp.PairC = pair.PairC
-	rsp.PairAAsk, rsp.PairABid = arbitrage.ExtractPrice(pair.PairA, in)
-	rsp.PairBAsk, rsp.PairBBid = arbitrage.ExtractPrice(pair.PairB, in)
-	rsp.PairCAsk, rsp.PairCBid = arbitrage.ExtractPrice(pair.PairC, in)
+
+	data, ok := pair.(appctx.TriangularKucoinPair)
+	if !ok {
+		return rsp, fmt.Errorf("invalid type triangular pair")
+	}
+
+	rsp.PairA = data.PairA
+	rsp.PairB = data.PairB
+	rsp.PairC = data.PairC
+	rsp.PairAAsk, rsp.PairABid = arbitrage.ExtractPrice(data.PairA, in)
+	rsp.PairBAsk, rsp.PairBBid = arbitrage.ExtractPrice(data.PairB, in)
+	rsp.PairCAsk, rsp.PairCBid = arbitrage.ExtractPrice(data.PairC, in)
 
 	return rsp, nil
 }

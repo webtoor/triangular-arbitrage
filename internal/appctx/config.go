@@ -15,12 +15,13 @@ var (
 )
 
 type Config struct {
-	App             *Common    `yaml:"app" json:"app"`
-	Triangular      Triangular `yaml:"triangular" json:"triangular"`
-	TriangularPairs []TriangularBinancePair
-	Logger          Logging `yaml:"logger" json:"logger"`
-	Binance         Binance `yaml:"binance" json:"binance"`
-	Kucoin          Kucoin  `yaml:"kucoin" json:"kucoin"`
+	App                    *Common    `yaml:"app" json:"app"`
+	Triangular             Triangular `yaml:"triangular" json:"triangular"`
+	TriangularBinancePairs []TriangularBinancePair
+	TriangularKucoinPairs  []TriangularKucoinPair
+	Logger                 Logging `yaml:"logger" json:"logger"`
+	Binance                Binance `yaml:"binance" json:"binance"`
+	Kucoin                 Kucoin  `yaml:"kucoin" json:"kucoin"`
 }
 
 type Common struct {
@@ -108,7 +109,7 @@ func NewConfig() *Config {
 			log.Fatal(err)
 		}
 
-		c.TriangularPairs = tp
+		c.TriangularBinancePairs = tp
 		_cfg = c
 	})
 
