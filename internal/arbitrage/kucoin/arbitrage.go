@@ -28,6 +28,63 @@ func New(cfg *appctx.Config, spot providers.Exchange) arbitrage.Triangular {
 
 func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingPairResp) (*arbitrage.TriangularTradeParam, error) {
 
+	var (
+		resp       arbitrage.TriangularTradeParam
+		directions = []string{consts.DirectionForward, consts.DirectionReverse}
+	)
+
+	if prices.PairAAsk == 0 || prices.PairABid == 0 || prices.PairBAsk == 0 || prices.PairBBid == 0 || prices.PairCAsk == 0 || prices.PairCBid == 0 {
+		return nil, nil
+	}
+
+	for _, direction := range directions {
+		if direction == consts.DirectionForward {
+			tradePairA := a.cfg.Triangular.Balance / prices.PairAAsk
+			tradePairB := tradePairA / prices.PairBAsk
+			tradePairC := tradePairB * prices.PairCBid
+
+			tradeWithFeePairA := (a.cfg.Triangular.Balance / prices.PairAAsk) - ((a.cfg.Triangular.Balance / prices.PairAAsk) * a.cfg.Binance.Fees)
+			tradeWithFeePairB := (tradeWithFeePairA / prices.PairBAsk) - ((tradeWithFeePairA / prices.PairBAsk) * a.cfg.Binance.Fees)
+			tradeWithFeePairC := (tradeWithFeePairB * prices.PairCBid) - ((tradeWithFeePairB * prices.PairCBid) * a.cfg.Binance.Fees)
+
+			if tradeWithFeePairC > a.cfg.Triangular.Balance {
+				resp.Exchange = consts.Kucoin
+				resp.Direction = consts.DirectionForward
+				resp.PairA = prices.PairA
+				resp.PairB = prices.PairB
+				resp.PairC = prices.PairC
+				resp.QtyPairA = a.cfg.Triangular.Balance
+				resp.QtyPairB = tradePairA
+				resp.QtyPairC = tradePairC
+				resp.FinalBalance = tradePairC
+				return &resp, nil
+			}
+		}
+
+		if direction == consts.DirectionReverse {
+			tradePairA := a.cfg.Triangular.Balance / prices.PairCAsk
+			tradePairB := tradePairA * prices.PairBBid
+			tradePairC := tradePairB * prices.PairABid
+
+			tradeWithFeePairA := (a.cfg.Triangular.Balance / prices.PairCAsk) - ((a.cfg.Triangular.Balance / prices.PairCAsk) * a.cfg.Binance.Fees)
+			tradeWithFeePairB := (tradeWithFeePairA * prices.PairBBid) - ((tradeWithFeePairA * prices.PairBBid) * a.cfg.Binance.Fees)
+			tradeWithFeePairC := (tradeWithFeePairB * prices.PairABid) - ((tradeWithFeePairB * prices.PairABid) * a.cfg.Binance.Fees)
+
+			if tradeWithFeePairC > a.cfg.Triangular.Balance {
+				resp.Exchange = consts.Kucoin
+				resp.Direction = consts.DirectionReverse
+				resp.PairA = prices.PairC
+				resp.PairB = prices.PairB
+				resp.PairC = prices.PairA
+				resp.QtyPairA = a.cfg.Triangular.Balance
+				resp.QtyPairB = tradePairB
+				resp.QtyPairC = tradePairC
+				resp.FinalBalance = tradePairC
+				return &resp, nil
+			}
+		}
+	}
+
 	return nil, nil
 }
 

@@ -121,6 +121,15 @@ func (t *triangular) Start(ctx context.Context) error {
 		}
 
 		if len(tradePairs) > 0 {
+			sort.Slice(tradePairs, func(i, j int) bool {
+				return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
+			})
+
+			fmt.Println(util.ToJSON(tradePairs[0]))
+			continue
+		}
+
+		if len(tradePairs) > 0 {
 
 			if exchange == consts.Binance {
 				if !t.cfg.Binance.TradeEnabled {

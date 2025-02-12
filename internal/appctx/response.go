@@ -12,8 +12,8 @@ var (
 
 // Response presentation contract object
 type Response struct {
-	Code        int    `json:"code"`
-	Status      string `json:"status"`
+	Code        int    `json:"code,omitempty"`
+	Status      string `json:"status,omitempty"`
 	Message     any    `json:"message,omitempty"`
 	Errors      any    `json:"errors,omitempty"`
 	Data        any    `json:"data,omitempty"`
