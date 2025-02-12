@@ -41,7 +41,7 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 		if direction == consts.DirectionForward {
 			tradePairA := t.cfg.Triangular.Balance / prices.PairAAsk
 			tradePairB := tradePairA / prices.PairBAsk
-			tradePairC := tradePairB * prices.PairCBid
+			_ = tradePairB * prices.PairCBid
 
 			tradeWithFeePairA := (t.cfg.Triangular.Balance / prices.PairAAsk) - ((t.cfg.Triangular.Balance / prices.PairAAsk) * t.cfg.Binance.Fees)
 			tradeWithFeePairB := (tradeWithFeePairA / prices.PairBAsk) - ((tradeWithFeePairA / prices.PairBAsk) * t.cfg.Binance.Fees)
@@ -54,9 +54,9 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 				resp.PairB = prices.PairB
 				resp.PairC = prices.PairC
 				resp.QtyPairA = t.cfg.Triangular.Balance
-				resp.QtyPairB = tradePairA
-				resp.QtyPairC = tradePairC
-				resp.FinalBalance = tradePairC
+				resp.QtyPairB = tradeWithFeePairA
+				resp.QtyPairC = tradeWithFeePairC
+				resp.FinalBalance = tradeWithFeePairC
 				return &resp, nil
 			}
 		}
@@ -64,7 +64,7 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 		if direction == consts.DirectionReverse {
 			tradePairA := t.cfg.Triangular.Balance / prices.PairCAsk
 			tradePairB := tradePairA * prices.PairBBid
-			tradePairC := tradePairB * prices.PairABid
+			_ = tradePairB * prices.PairABid
 
 			tradeWithFeePairA := (t.cfg.Triangular.Balance / prices.PairCAsk) - ((t.cfg.Triangular.Balance / prices.PairCAsk) * t.cfg.Binance.Fees)
 			tradeWithFeePairB := (tradeWithFeePairA * prices.PairBBid) - ((tradeWithFeePairA * prices.PairBBid) * t.cfg.Binance.Fees)
@@ -77,9 +77,9 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 				resp.PairB = prices.PairB
 				resp.PairC = prices.PairA
 				resp.QtyPairA = t.cfg.Triangular.Balance
-				resp.QtyPairB = tradePairB
-				resp.QtyPairC = tradePairC
-				resp.FinalBalance = tradePairC
+				resp.QtyPairB = tradeWithFeePairB
+				resp.QtyPairC = tradeWithFeePairC
+				resp.FinalBalance = tradeWithFeePairC
 				return &resp, nil
 			}
 		}

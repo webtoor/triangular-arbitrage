@@ -120,14 +120,14 @@ func (t *triangular) Start(ctx context.Context) error {
 			return err
 		}
 
-		if len(tradePairs) > 0 {
-			sort.Slice(tradePairs, func(i, j int) bool {
-				return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
-			})
+		// if len(tradePairs) > 0 {
+		// 	sort.Slice(tradePairs, func(i, j int) bool {
+		// 		return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
+		// 	})
 
-			fmt.Println(util.ToJSON(tradePairs[0]))
-			continue
-		}
+		// 	fmt.Println(util.ToJSON(tradePairs[0]))
+		// 	continue
+		// }
 
 		if len(tradePairs) > 0 {
 
@@ -149,7 +149,7 @@ func (t *triangular) Start(ctx context.Context) error {
 				return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
 			})
 
-			fmt.Println(util.ToJSON(tradePairs))
+			fmt.Println(util.ToJSON(tradePairs[0]))
 
 			trade := []providers.PlaceOrderRequest{
 				{
@@ -173,14 +173,14 @@ func (t *triangular) Start(ctx context.Context) error {
 					Symbol:   tradePairs[0].PairC,
 					Side:     consts.BinanceSideSell,
 					Type:     consts.BinanceTypeMarket,
-					Quantity: tradePairs[0].QtyPairC,
+					Quantity: util.Round(tradePairs[0].QtyPairC, 6),
 				},
 			}
 
 			for _, order := range trade {
 				respOrder, err := t.spot.SetExchange(exchange).PlaceOrder(ctx, order)
 				if err != nil {
-					logger.ErrorWithContext(ctx, fmt.Sprintf("%s place order error: %v, request %v, raw_response: %v, status_code: %v", exchange, err, order, respOrder.RawResponse(), respOrder.Code), lf...)
+					logger.ErrorWithContext(ctx, fmt.Sprintf("%s place order error: %v, request %v, raw_response: %v, status_code: %v", exchange, err, util.ToJSON(order), respOrder.RawResponse(), respOrder.Code), lf...)
 					return err
 				}
 				logger.InfoWithContext(ctx, fmt.Sprintf("%s success place order, raw_request: %v", exchange, util.ToJSON(order)), lf...)

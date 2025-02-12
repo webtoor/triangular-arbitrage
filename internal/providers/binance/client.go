@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/spf13/cast"
 	"github.com/webtoor/triangular-arbitrage/internal/appctx"
 	"github.com/webtoor/triangular-arbitrage/internal/providers"
 	"github.com/webtoor/triangular-arbitrage/pkg/httpx"
@@ -107,7 +108,7 @@ func (p *binance) PlaceOrder(ctx context.Context, in any) (appctx.Response, erro
 	mapParams.Set("symbol", param.Symbol)
 	mapParams.Set("side", param.Side)
 	mapParams.Set("type", fmt.Sprint(param.Type))
-	mapParams.Set("quoteOrderQty", fmt.Sprint(float32(param.Quantity)))
+	mapParams.Set("quoteOrderQty", fmt.Sprintf("%v", cast.ToString(param.Quantity)))
 	mapParams.Set("timestamp", fmt.Sprint(timestamp))
 	mapParams.Set("signature", createSign(mapParams, p.cfg.Binance.SecretKey))
 
