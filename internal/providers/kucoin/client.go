@@ -55,7 +55,47 @@ func (p *kucoin) GetAllSymbols(ctx context.Context) (appctx.Response, error) {
 }
 
 func (p *kucoin) TickerPrices(ctx context.Context) (appctx.Response, error) {
-	return *appctx.NewResponse(), fmt.Errorf("invalid exchange")
+	var (
+		resp     = appctx.NewResponse()
+		tickers  []providers.TickerPrices
+		respBody TickerPricesResponse
+		url      = fmt.Sprintf("%s%s", p.cfg.Kucoin.BaseUrl, p.cfg.Kucoin.PathTickerPrices)
+	)
+
+	reqOption := httpx.RequestOptions{
+		Context: ctx,
+		Method:  http.MethodGet,
+		Timeout: time.Duration(p.cfg.Kucoin.Timeout) * time.Second,
+		URL:     url,
+	}
+
+	req, err := httpx.Request(reqOption)
+
+	if err != nil {
+		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("error: %v", err)
+	}
+
+	if req.Status() != http.StatusOK {
+		return *resp.WithCode(req.Status()).WithRawResponse(req.String()), fmt.Errorf("http status code %v", req.Status())
+	}
+
+	err = req.DecodeJSON(&respBody)
+
+	if err != nil {
+		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("error: %v", err)
+	}
+
+	for _, v := range respBody.Data.Ticker {
+		tickers = append(tickers, providers.TickerPrices{
+			Symbol:    v["symbol"],
+			LastPrice: v["last"],
+			BidPrice:  v["buy"],
+			BidQty:    v["bestBidSize"],
+			AskPrice:  v["sell"],
+			AskQty:    v["bestAskSize"],
+		})
+	}
+	return *resp.WithCode(req.Status()).WithData(tickers), nil
 }
 
 func (p *kucoin) PlaceOrder(ctx context.Context, in any) (appctx.Response, error) {

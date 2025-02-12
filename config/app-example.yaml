@@ -35,6 +35,6 @@ kucoin:
   fees: 0.001
   base_url: https://api.kucoin.com
   path_symbols: /api/v2/symbols
-  path_ticker_prices: /api/v3/ticker/24hr
+  path_ticker_prices: /api/v1/market/allTickers
   path_place_order: /api/v3/order/test
   Timeout: 50
