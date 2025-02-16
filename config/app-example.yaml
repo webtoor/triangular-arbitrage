@@ -29,6 +29,7 @@ binance:
 kucoin:
   api_key:
   secret_key:
+  api_passphrase:
   path_triangular_pairs: "config/kucoin-pairs.json"
   triangular_enabled: true
   trade_enabled: false
@@ -37,4 +38,5 @@ kucoin:
   path_symbols: /api/v2/symbols
   path_ticker_prices: /api/v1/market/allTickers
   path_place_order: /api/v3/order/test
+  path_get_order_by_id: /api/v1/hf/orders/client-order
   Timeout: 50
