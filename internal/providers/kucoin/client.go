@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/spf13/cast"
@@ -114,8 +116,8 @@ func (p *kucoin) PlaceOrder(ctx context.Context, in any) (appctx.Response, error
 
 	pl := PlaceOrderRequest{
 		Symbol: param.Symbol,
-		Type:   param.Type,
-		Side:   param.Side,
+		Type:   strings.ToLower(param.Type),
+		Side:   strings.ToLower(param.Side),
 		Size:   cast.ToString(param.Quantity),
 	}
 
@@ -137,6 +139,57 @@ func (p *kucoin) PlaceOrder(ctx context.Context, in any) (appctx.Response, error
 		Timeout: time.Duration(p.cfg.Kucoin.Timeout) * time.Second,
 		URL:     requestUrl,
 		Payload: pl,
+		Header:  h,
+	}
+
+	req, err := httpx.Request(reqOption)
+
+	if err != nil {
+		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("error: %v", err)
+	}
+
+	if req.Status() != http.StatusOK {
+		return *resp.WithCode(req.Status()).WithRawResponse(req.String()), fmt.Errorf("http status code %v", req.Status())
+	}
+
+	err = req.DecodeJSON(&respBody)
+
+	if err != nil {
+		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("error: %v", err)
+	}
+
+	return *resp.WithCode(req.Status()).WithData(respBody).WithRawResponse(req.String()), nil
+}
+
+func (p *kucoin) GetOrderByID(ctx context.Context, id, symbol string) (appctx.Response, error) {
+	var (
+		resp       = appctx.NewResponse()
+		respBody   = GetOrderByIDResponse{}
+		requestUrl = fmt.Sprintf("%s%s/%s", p.cfg.Kucoin.BaseUrl, p.cfg.Kucoin.PathGetOrderByID, id)
+	)
+
+	mapParams := url.Values{}
+	mapParams.Set("symbol", symbol)
+
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+	sign := createSign(fmt.Sprintf("%s%s/%s?%s", http.MethodGet, p.cfg.Kucoin.PathGetOrderByID, id, mapParams.Encode()), cast.ToString(timestamp), p.cfg.Kucoin.SecretKey)
+	passphrase := createSign(p.cfg.Kucoin.ApiPassphrase, util.EmptyString(), p.cfg.Kucoin.SecretKey)
+
+	h := httpx.Headers{}
+	h.Add("KC-API-KEY", p.cfg.Kucoin.ApiKey)
+	h.Add("KC-API-PASSPHRASE", passphrase)
+	h.Add("KC-API-TIMESTAMP", cast.ToString(timestamp))
+	h.Add("KC-API-SIGN", sign)
+	h.Add("KC-API-KEY-VERSION", "3")
+
+	requestUrl += "?"
+	requestUrl += mapParams.Encode()
+
+	reqOption := httpx.RequestOptions{
+		Context: ctx,
+		Method:  http.MethodGet,
+		Timeout: time.Duration(p.cfg.Kucoin.Timeout) * time.Second,
+		URL:     requestUrl,
 		Header:  h,
 	}
 

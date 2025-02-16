@@ -144,3 +144,7 @@ func (p *binance) PlaceOrder(ctx context.Context, in any) (appctx.Response, erro
 
 	return *resp.WithCode(req.Status()).WithData(respBody).WithRawResponse(req.String()), nil
 }
+
+func (p *binance) GetOrderByID(ctx context.Context, id, symbol string) (appctx.Response, error) {
+	return *appctx.NewResponse(), fmt.Errorf("GetOrderByID: invalid exchange")
+}

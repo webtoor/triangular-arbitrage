@@ -10,6 +10,7 @@ type TickerPrices struct {
 }
 
 type PlaceOrderRequest struct {
+	ID          string  `json:"id,omitempty"`
 	Symbol      string  `json:"symbol,omitempty"`
 	Side        string  `json:"side,omitempty"`
 	Type        string  `json:"type,omitempty"`

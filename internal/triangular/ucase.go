@@ -120,16 +120,13 @@ func (t *triangular) Start(ctx context.Context) error {
 			return err
 		}
 
-		// if len(tradePairs) > 0 {
-		// 	sort.Slice(tradePairs, func(i, j int) bool {
-		// 		return tradePairs[i].FinalBalance > tradePairs[j].FinalBalance
-		// 	})
-
-		// 	fmt.Println(util.ToJSON(tradePairs[0]))
-		// 	continue
-		// }
-
 		if len(tradePairs) > 0 {
+
+			sort.Slice(tradePairs, func(i, j int) bool {
+				return tradePairs[i].FinalFunds > tradePairs[j].FinalFunds
+			})
+
+			fmt.Println(util.ToJSON(tradePairs[0]))
 
 			if exchange == consts.Binance {
 				if !t.cfg.Binance.TradeEnabled {
@@ -145,45 +142,46 @@ func (t *triangular) Start(ctx context.Context) error {
 				t.cfg.Kucoin.TriangularEnabled = false
 			}
 
-			sort.Slice(tradePairs, func(i, j int) bool {
-				return tradePairs[i].FinalFunds > tradePairs[j].FinalFunds
-			})
-
-			fmt.Println(util.ToJSON(tradePairs[0]))
-
 			trade := []providers.PlaceOrderRequest{
 				{
 					Symbol:   tradePairs[0].PairA,
-					Side:     consts.BinanceSideBuy,
-					Type:     consts.BinanceTypeMarket,
+					Side:     consts.OrderSideBuy,
+					Type:     consts.OrderTypeMarket,
 					Quantity: tradePairs[0].QtyPairA,
 				},
 				{
 					Symbol: tradePairs[0].PairB,
 					Side: func() string {
-						if tradePairs[0].Direction == consts.DirectionReverse {
-							return consts.BinanceSideSell
+						if tradePairs[0].Direction == consts.DirectionForward {
+							return consts.OrderSideBuy
 						}
-						return consts.BinanceSideBuy
+						return consts.OrderSideSell
 					}(),
-					Type:     consts.BinanceTypeMarket,
-					Quantity: util.Round(tradePairs[0].QtyPairB, 8),
+					Type:     consts.OrderTypeMarket,
+					Quantity: tradePairs[0].QtyPairB,
 				},
 				{
 					Symbol:   tradePairs[0].PairC,
-					Side:     consts.BinanceSideSell,
-					Type:     consts.BinanceTypeMarket,
-					Quantity: util.Round(tradePairs[0].QtyPairC, 6),
+					Side:     consts.OrderSideSell,
+					Type:     consts.OrderTypeMarket,
+					Quantity: tradePairs[0].QtyPairC,
 				},
 			}
 
 			for _, order := range trade {
 				respOrder, err := t.spot.SetExchange(exchange).PlaceOrder(ctx, order)
+
+				lf.Append(logger.Any("exchange", exchange))
+				lf.Append(logger.Any("raw_request", util.ToJSON(order)))
+				lf.Append(logger.Any("raw_response", respOrder.RawResponse()))
+				lf.Append(logger.Any("status_code", respOrder.Code))
+
 				if err != nil {
-					logger.ErrorWithContext(ctx, fmt.Sprintf("%s place order error: %v, request %v, raw_response: %v, status_code: %v", exchange, err, util.ToJSON(order), respOrder.RawResponse(), respOrder.Code), lf...)
+					logger.ErrorWithContext(ctx, fmt.Sprintf("place order error: %v", err), lf...)
 					return err
 				}
-				logger.InfoWithContext(ctx, fmt.Sprintf("%s success place order, raw_request: %v", exchange, util.ToJSON(order)), lf...)
+
+				logger.InfoWithContext(ctx, "success place order", lf...)
 			}
 		}
 

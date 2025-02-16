@@ -29,3 +29,15 @@ type PlaceOrderRequest struct {
 	Size   string `json:"size,omitempty"`
 	Funds  string `json:"funds,omitempty"`
 }
+
+type GetOrderByIDResponse struct {
+	Code string `json:"code"`
+	Data struct {
+		ID     string `json:"id"`
+		Symbol string `json:"symbol"`
+		Type   string `json:"type"`
+		Side   string `json:"side"`
+		Size   string `json:"size"`
+		Price  string `json:"price"`
+	} `json:"data"`
+}

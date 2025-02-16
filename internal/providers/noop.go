@@ -21,3 +21,7 @@ func (n *noop) TickerPrices(ctx context.Context) (appctx.Response, error) {
 func (n *noop) PlaceOrder(ctx context.Context, in any) (appctx.Response, error) {
 	return *appctx.NewResponse(), fmt.Errorf("PlaceOrder: invalid exchange")
 }
+
+func (n *noop) GetOrderByID(ctx context.Context, id, symbol string) (appctx.Response, error) {
+	return *appctx.NewResponse(), fmt.Errorf("GetOrderByID: invalid exchange")
+}
