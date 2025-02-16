@@ -39,10 +39,6 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 
 	for _, direction := range directions {
 		if direction == consts.DirectionForward {
-			tradePairA := t.cfg.Triangular.Balance / prices.PairAAsk
-			tradePairB := tradePairA / prices.PairBAsk
-			_ = tradePairB * prices.PairCBid
-
 			tradeWithFeePairA := (t.cfg.Triangular.Balance / prices.PairAAsk) - ((t.cfg.Triangular.Balance / prices.PairAAsk) * t.cfg.Binance.Fees)
 			tradeWithFeePairB := (tradeWithFeePairA / prices.PairBAsk) - ((tradeWithFeePairA / prices.PairBAsk) * t.cfg.Binance.Fees)
 			tradeWithFeePairC := (tradeWithFeePairB * prices.PairCBid) - ((tradeWithFeePairB * prices.PairCBid) * t.cfg.Binance.Fees)
@@ -53,8 +49,8 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 				resp.PairA = prices.PairA
 				resp.PairB = prices.PairB
 				resp.PairC = prices.PairC
-				resp.QtyPairA = t.cfg.Triangular.Balance
-				resp.QtyPairB = tradeWithFeePairA
+				resp.QtyPairA = tradeWithFeePairA
+				resp.QtyPairB = tradeWithFeePairB
 				resp.QtyPairC = tradeWithFeePairC
 				resp.InitialFunds = t.cfg.Triangular.Balance
 				resp.FinalFunds = tradeWithFeePairC
@@ -63,10 +59,6 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 		}
 
 		if direction == consts.DirectionReverse {
-			tradePairA := t.cfg.Triangular.Balance / prices.PairCAsk
-			tradePairB := tradePairA * prices.PairBBid
-			_ = tradePairB * prices.PairABid
-
 			tradeWithFeePairA := (t.cfg.Triangular.Balance / prices.PairCAsk) - ((t.cfg.Triangular.Balance / prices.PairCAsk) * t.cfg.Binance.Fees)
 			tradeWithFeePairB := (tradeWithFeePairA * prices.PairBBid) - ((tradeWithFeePairA * prices.PairBBid) * t.cfg.Binance.Fees)
 			tradeWithFeePairC := (tradeWithFeePairB * prices.PairABid) - ((tradeWithFeePairB * prices.PairABid) * t.cfg.Binance.Fees)
@@ -77,7 +69,7 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 				resp.PairA = prices.PairC
 				resp.PairB = prices.PairB
 				resp.PairC = prices.PairA
-				resp.QtyPairA = t.cfg.Triangular.Balance
+				resp.QtyPairA = tradeWithFeePairA
 				resp.QtyPairB = tradeWithFeePairB
 				resp.QtyPairC = tradeWithFeePairC
 				resp.InitialFunds = t.cfg.Triangular.Balance
