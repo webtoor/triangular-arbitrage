@@ -5,12 +5,11 @@ import (
 	"github.com/webtoor/triangular-arbitrage/internal/providers"
 )
 
-func ExtractPrice(pair string, prices []providers.TickerPrices) (ask float64, bid float64, askQty float64, bidQty float64) {
+func ExtractPrice(pair string, prices []providers.TickerPrices) (ask float64, bid float64, askQty string, bidQty string) {
 	for _, price := range prices {
 		if price.Symbol == pair {
-			return cast.ToFloat64(price.AskPrice), cast.ToFloat64(price.BidPrice), cast.ToFloat64(price.AskQty), cast.ToFloat64(price.BidQty)
+			return cast.ToFloat64(price.AskPrice), cast.ToFloat64(price.BidPrice), price.AskQty, price.BidQty
 		}
 	}
-
 	return
 }

@@ -149,7 +149,7 @@ func (p *kucoin) PlaceOrder(ctx context.Context, in any) (appctx.Response, error
 	req, err := httpx.Request(reqOption)
 
 	if err != nil {
-		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("error: %v", err)
+		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("%v", err)
 	}
 
 	if req.Status() != http.StatusOK {
@@ -159,7 +159,13 @@ func (p *kucoin) PlaceOrder(ctx context.Context, in any) (appctx.Response, error
 	err = req.DecodeJSON(&respBody)
 
 	if err != nil {
-		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("error: %v", err)
+		return *resp.WithCode(http.StatusInternalServerError), fmt.Errorf("%v", err)
+	}
+
+	_, ok = respBody["data"]
+
+	if !ok {
+		return *resp.WithCode(http.StatusInternalServerError).WithRawResponse(req.String()), fmt.Errorf("%v", respBody["msg"])
 	}
 
 	return *resp.WithCode(req.Status()).WithData(respBody).WithRawResponse(req.String()), nil

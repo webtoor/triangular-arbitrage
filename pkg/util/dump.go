@@ -100,3 +100,10 @@ func ToJSON(v any) string {
 	r, _ := json.Marshal(v)
 	return string(r)
 }
+
+func ToMap(v any) map[string]interface{} {
+	r, _ := json.Marshal(v)
+	var m map[string]interface{}
+	_ = json.Unmarshal(r, &m)
+	return m
+}

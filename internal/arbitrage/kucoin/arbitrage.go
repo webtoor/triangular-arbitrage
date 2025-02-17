@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/spf13/cast"
 	"github.com/webtoor/triangular-arbitrage/internal/appctx"
 	"github.com/webtoor/triangular-arbitrage/internal/arbitrage"
 	"github.com/webtoor/triangular-arbitrage/internal/common"
@@ -88,20 +89,22 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 			// Filter Profitable
 			if tradeWithFeePairC > (a.cfg.Triangular.Balance + (a.cfg.Triangular.Balance * a.cfg.Triangular.Profit)) {
 
-				resp.Exchange = consts.Kucoin
-				resp.Direction = consts.DirectionReverse
-				resp.PairA = prices.PairC
-				resp.PairB = prices.PairB
-				resp.PairC = prices.PairA
-				resp.PricesA = prices.PairCAsk
-				resp.PricesB = prices.PairBBid
-				resp.PricesC = prices.PairABid
-				resp.QtyPairA = util.Precision(tradePairA, prices.PairCAskQty)
-				resp.QtyPairB = util.Precision(tradeWithFeePairA, prices.PairBBidQty)
-				resp.QtyPairC = util.Precision(tradeWithFeePairB, prices.PairABidQty)
-				resp.InitialFunds = a.cfg.Triangular.Balance
-				resp.FinalFunds = tradeWithFeePairC
-				return &resp, nil
+				if cast.ToFloat64(prices.PairCAskQty) > tradePairA && cast.ToFloat64(prices.PairBBidQty) > tradeWithFeePairA && cast.ToFloat64(prices.PairABidQty) > tradeWithFeePairB {
+					resp.Exchange = consts.Kucoin
+					resp.Direction = consts.DirectionReverse
+					resp.PairA = prices.PairC
+					resp.PairB = prices.PairB
+					resp.PairC = prices.PairA
+					resp.PricesA = prices.PairCAsk
+					resp.PricesB = prices.PairBBid
+					resp.PricesC = prices.PairABid
+					resp.QtyPairA = util.Precision(tradePairA, prices.PairCAskQty)
+					resp.QtyPairB = util.Precision(tradeWithFeePairA, prices.PairBBidQty)
+					resp.QtyPairC = util.Precision(tradeWithFeePairB, prices.PairABidQty)
+					resp.InitialFunds = a.cfg.Triangular.Balance
+					resp.FinalFunds = util.Round(tradeWithFeePairC, 4)
+					return &resp, nil
+				}
 			}
 		}
 	}

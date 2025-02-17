@@ -3,8 +3,6 @@ package util
 import (
 	"math"
 	"strings"
-
-	"github.com/spf13/cast"
 )
 
 func Round(val float64, precision int) float64 {
@@ -12,13 +10,11 @@ func Round(val float64, precision int) float64 {
 	return math.Round(val*ratio) / ratio
 }
 
-func Precision(target, source float64) float64 {
-	src := cast.ToString(source)
-
-	points := strings.SplitAfter(src, ".")
+func Precision(target float64, source string) float64 {
+	points := strings.SplitAfter(source, ".")
 
 	if len(points) < 2 {
-		return target
+		return Round(target, 0)
 	}
 
 	return Round(target, len(points[1]))
