@@ -35,6 +35,7 @@ type Triangular struct {
 	Exchanges []string `yaml:"exchanges" json:"exchanges"`
 	Interval  int      `yaml:"interval" json:"interval"`
 	Balance   float64  `yaml:"balance" json:"balance"`
+	Profit    float64  `yaml:"profit" json:"profit"`
 }
 
 type Logging struct {

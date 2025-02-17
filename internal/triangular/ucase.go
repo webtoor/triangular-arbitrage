@@ -171,7 +171,6 @@ func (t *triangular) Start(ctx context.Context) error {
 			for _, order := range trade {
 				respOrder, err := t.spot.SetExchange(exchange).PlaceOrder(ctx, order)
 
-				lf.Append(logger.Any("exchange", exchange))
 				lf.Append(logger.Any("raw_request", util.ToJSON(order)))
 				lf.Append(logger.Any("raw_response", respOrder.RawResponse()))
 				lf.Append(logger.Any("status_code", respOrder.Code))
