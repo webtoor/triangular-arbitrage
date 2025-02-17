@@ -94,9 +94,9 @@ func (t *binance) PriceByTradingPair(ctx context.Context, pair any, in []provide
 	rsp.PairA = data.PairA
 	rsp.PairB = data.PairB
 	rsp.PairC = data.PairC
-	rsp.PairAAsk, rsp.PairABid = arbitrage.ExtractPrice(data.PairA, in)
-	rsp.PairBAsk, rsp.PairBBid = arbitrage.ExtractPrice(data.PairB, in)
-	rsp.PairCAsk, rsp.PairCBid = arbitrage.ExtractPrice(data.PairC, in)
+	rsp.PairAAsk, rsp.PairABid, rsp.PairAAskQty, rsp.PairABidQty = arbitrage.ExtractPrice(data.PairA, in)
+	rsp.PairBAsk, rsp.PairBBid, rsp.PairBAskQty, rsp.PairBBidQty = arbitrage.ExtractPrice(data.PairB, in)
+	rsp.PairCAsk, rsp.PairCBid, rsp.PairCAskQty, rsp.PairCBidQty = arbitrage.ExtractPrice(data.PairC, in)
 
 	return rsp, nil
 }
