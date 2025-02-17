@@ -102,6 +102,10 @@ func (p *kucoin) TickerPrices(ctx context.Context) (appctx.Response, error) {
 	return *resp.WithCode(req.Status()).WithData(tickers), nil
 }
 
+func (p *kucoin) GetOrderBook(ctx context.Context, symbol string) (appctx.Response, error) {
+	return *appctx.NewResponse(), fmt.Errorf("GetOrderBook: invalid exchange")
+}
+
 func (p *kucoin) PlaceOrder(ctx context.Context, in any) (appctx.Response, error) {
 	var (
 		resp       = appctx.NewResponse()

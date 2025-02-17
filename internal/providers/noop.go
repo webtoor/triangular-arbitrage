@@ -18,6 +18,10 @@ func (n *noop) TickerPrices(ctx context.Context) (appctx.Response, error) {
 	return *appctx.NewResponse(), fmt.Errorf("TickerPrices: invalid exchange")
 }
 
+func (n *noop) GetOrderBook(ctx context.Context, symbol string) (appctx.Response, error) {
+	return *appctx.NewResponse(), fmt.Errorf("GetOrderBook: invalid exchange")
+}
+
 func (n *noop) PlaceOrder(ctx context.Context, in any) (appctx.Response, error) {
 	return *appctx.NewResponse(), fmt.Errorf("PlaceOrder: invalid exchange")
 }

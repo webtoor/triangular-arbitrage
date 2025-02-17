@@ -68,6 +68,7 @@ type Kucoin struct {
 	BaseUrl             string  `yaml:"base_url" json:"base_url"`
 	PathSymbols         string  `yaml:"path_symbols" json:"path_symbols"`
 	PathTickerPrices    string  `yaml:"path_ticker_prices" json:"path_ticker_prices"`
+	PathOrderBook       string  `yaml:"path_order_book" json:"path_order_book"`
 	PathPlaceOrder      string  `yaml:"path_place_order" json:"path_place_order"`
 	PathGetOrderByID    string  `yaml:"path_get_order_by_id" json:"path_get_order_by_id"`
 	Timeout             int     `yaml:"timeout" json:"timeout"`

@@ -51,9 +51,12 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 				resp.PairA = prices.PairA
 				resp.PairB = prices.PairB
 				resp.PairC = prices.PairC
+				resp.PricesA = prices.PairAAsk
+				resp.PricesB = prices.PairBAsk
+				resp.PricesC = prices.PairABid
 				resp.QtyPairA = util.Round(tradePairA, 8)
-				resp.QtyPairB = util.Round(tradeWithFeePairA, 8)
-				resp.QtyPairC = util.Round(tradeWithFeePairB, 8)
+				resp.QtyPairB = util.Round(tradeWithFeePairA, 0)
+				resp.QtyPairC = util.Round(tradeWithFeePairB, 2)
 				resp.InitialFunds = a.cfg.Triangular.Balance
 				resp.FinalFunds = tradeWithFeePairC
 				return &resp, nil
@@ -73,8 +76,11 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 				resp.PairA = prices.PairC
 				resp.PairB = prices.PairB
 				resp.PairC = prices.PairA
+				resp.PricesA = prices.PairCAsk
+				resp.PricesB = prices.PairBBid
+				resp.PricesC = prices.PairABid
 				resp.QtyPairA = util.Round(tradePairA, 2)
-				resp.QtyPairB = util.Round(tradeWithFeePairA, 4)
+				resp.QtyPairB = util.Round(tradeWithFeePairA, 2)
 				resp.QtyPairC = util.Round(tradeWithFeePairB, 8)
 				resp.InitialFunds = a.cfg.Triangular.Balance
 				resp.FinalFunds = tradeWithFeePairC

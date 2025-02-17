@@ -18,6 +18,9 @@ type TriangularTradeParam struct {
 	PairA        string  `json:"pair_a"`
 	PairB        string  `json:"pair_b"`
 	PairC        string  `json:"pair_c"`
+	PricesA      float64 `json:"prices_a"`
+	PricesB      float64 `json:"prices_b"`
+	PricesC      float64 `json:"prices_c"`
 	QtyPairA     float64 `json:"qty_pair_a"`
 	QtyPairB     float64 `json:"qty_pair_b"`
 	QtyPairC     float64 `json:"qty_pair_c"`

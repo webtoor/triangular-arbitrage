@@ -90,6 +90,10 @@ func (p *binance) TickerPrices(ctx context.Context) (appctx.Response, error) {
 
 }
 
+func (p *binance) GetOrderBook(ctx context.Context, symbol string) (appctx.Response, error) {
+	return *appctx.NewResponse(), fmt.Errorf("GetOrderBook: invalid exchange")
+}
+
 func (p *binance) PlaceOrder(ctx context.Context, in any) (appctx.Response, error) {
 	var (
 		resp       = appctx.NewResponse()
