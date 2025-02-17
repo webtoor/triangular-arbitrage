@@ -188,9 +188,9 @@ func (t *triangular) Start(ctx context.Context) error {
 			t.cfg.Binance.TriangularEnabled = true
 		}
 
-		// if exchange == consts.Kucoin {
-		// 	t.cfg.Kucoin.TriangularEnabled = true
-		// }
+		if exchange == consts.Kucoin {
+			t.cfg.Kucoin.TriangularEnabled = true
+		}
 	}
 
 	return nil

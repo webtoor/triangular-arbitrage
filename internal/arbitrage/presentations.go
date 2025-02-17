@@ -6,14 +6,14 @@ type PriceByTradingPairResp struct {
 	PairC       string  `json:"pair_c"`
 	PairAAsk    float64 `json:"pair_a_ask"`
 	PairABid    float64 `json:"pair_a_bid"`
-	PairBBid    float64 `json:"pair_b_bid"`
 	PairBAsk    float64 `json:"pair_b_ask"`
+	PairBBid    float64 `json:"pair_b_bid"`
 	PairCAsk    float64 `json:"pair_c_ask"`
 	PairCBid    float64 `json:"pair_c_bid"`
 	PairAAskQty float64 `json:"pair_a_ask_qty"`
 	PairABidQty float64 `json:"pair_a_bid_qty"`
-	PairBBidQty float64 `json:"pair_b_bid_qty"`
 	PairBAskQty float64 `json:"pair_b_ask_qty"`
+	PairBBidQty float64 `json:"pair_b_bid_qty"`
 	PairCAskQty float64 `json:"pair_c_ask_qty"`
 	PairCBidQty float64 `json:"pair_c_bid_qty"`
 }
