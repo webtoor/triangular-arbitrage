@@ -82,13 +82,13 @@ func (t *binance) Calculate(ctx context.Context, prices arbitrage.PriceByTrading
 	return nil, nil
 }
 
-func (t *binance) PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
+func (t *binance) PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (*arbitrage.PriceByTradingPairResp, error) {
 
 	rsp := arbitrage.PriceByTradingPairResp{}
 
 	data, ok := pair.(appctx.TriangularBinancePair)
 	if !ok {
-		return rsp, fmt.Errorf("invalid type triangular pair")
+		return &rsp, fmt.Errorf("invalid type triangular pair")
 	}
 
 	rsp.PairA = data.PairA
@@ -98,7 +98,7 @@ func (t *binance) PriceByTradingPair(ctx context.Context, pair any, in []provide
 	rsp.PairBAsk, rsp.PairBBid, rsp.PairBAskQty, rsp.PairBBidQty = arbitrage.ExtractPrice(data.PairB, in)
 	rsp.PairCAsk, rsp.PairCBid, rsp.PairCAskQty, rsp.PairCBidQty = arbitrage.ExtractPrice(data.PairC, in)
 
-	return rsp, nil
+	return &rsp, nil
 }
 
 func (t *binance) GenerateTriangularPairs(ctx context.Context) error {

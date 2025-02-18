@@ -13,9 +13,9 @@ func Round(val float64, precision int) float64 {
 func Precision(target float64, source string) float64 {
 	points := strings.SplitAfter(source, ".")
 
-	if len(points) < 2 {
-		return Round(target, 0)
+	if len(points) == 2 {
+		return Round(target, len(points[1]))
 	}
 
-	return Round(target, len(points[1]))
+	return target
 }

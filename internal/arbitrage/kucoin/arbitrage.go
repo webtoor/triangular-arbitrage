@@ -84,7 +84,7 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 			tradeWithFeePairC := (tradeWithFeePairB * prices.PairABid) - ((tradeWithFeePairB * prices.PairABid) * a.cfg.Binance.Fees)
 
 			// Filter Profitable
-			if tradeWithFeePairC < (a.cfg.Triangular.Balance + (a.cfg.Triangular.Balance * a.cfg.Triangular.Profit)) {
+			if tradeWithFeePairC > (a.cfg.Triangular.Balance + (a.cfg.Triangular.Balance * a.cfg.Triangular.Profit)) {
 				// Filter Quantity
 				if cast.ToFloat64(prices.PairCAskQty) > tradePairA && cast.ToFloat64(prices.PairBBidQty) > tradeWithFeePairA && cast.ToFloat64(prices.PairABidQty) > tradeWithFeePairB {
 					resp.Exchange = consts.Kucoin
@@ -109,13 +109,13 @@ func (a *kucoin) Calculate(ctx context.Context, prices arbitrage.PriceByTradingP
 	return nil, nil
 }
 
-func (a *kucoin) PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (arbitrage.PriceByTradingPairResp, error) {
+func (a *kucoin) PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (*arbitrage.PriceByTradingPairResp, error) {
 
 	var rsp arbitrage.PriceByTradingPairResp
 
 	data, ok := pair.(appctx.TriangularKucoinPair)
 	if !ok {
-		return rsp, fmt.Errorf("invalid type triangular pair")
+		return &rsp, fmt.Errorf("invalid type triangular pair")
 	}
 
 	rsp.PairA = data.PairA
@@ -125,7 +125,7 @@ func (a *kucoin) PriceByTradingPair(ctx context.Context, pair any, in []provider
 	rsp.PairBAsk, rsp.PairBBid, rsp.PairBAskQty, rsp.PairBBidQty = arbitrage.ExtractPrice(data.PairB, in)
 	rsp.PairCAsk, rsp.PairCBid, rsp.PairCAskQty, rsp.PairCBidQty = arbitrage.ExtractPrice(data.PairC, in)
 
-	return rsp, nil
+	return &rsp, nil
 }
 
 func (a *kucoin) GenerateTriangularPairs(ctx context.Context) error {

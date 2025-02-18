@@ -14,8 +14,8 @@ func (n *noop) GenerateTriangularPairs(ctx context.Context) error {
 	return errors.New("GenerateTriangularPairs: invalid exchange")
 }
 
-func (n *noop) PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (PriceByTradingPairResp, error) {
-	return PriceByTradingPairResp{}, errors.New("PriceByTradingPair: invalid exchange")
+func (n *noop) PriceByTradingPair(ctx context.Context, pair any, in []providers.TickerPrices) (*PriceByTradingPairResp, error) {
+	return &PriceByTradingPairResp{}, errors.New("PriceByTradingPair: invalid exchange")
 }
 
 func (n *noop) Calculate(ctx context.Context, prices PriceByTradingPairResp) (*TriangularTradeParam, error) {

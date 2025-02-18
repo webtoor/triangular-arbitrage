@@ -73,7 +73,11 @@ func (t *triangular) Start(ctx context.Context) error {
 							return fmt.Errorf("get price by trading pair error: %v", err)
 						}
 
-						rsp, err := t.arbitrage.Resolve(consts.Binance).Calculate(gCtx, resp)
+						if resp == nil {
+							return nil
+						}
+
+						rsp, err := t.arbitrage.Resolve(consts.Binance).Calculate(gCtx, *resp)
 
 						if err != nil {
 							return fmt.Errorf("calculate error: %v", err)
@@ -99,7 +103,11 @@ func (t *triangular) Start(ctx context.Context) error {
 							return fmt.Errorf("get price by trading pair error: %v", err)
 						}
 
-						rsp, err := t.arbitrage.Resolve(consts.Kucoin).Calculate(gCtx, resp)
+						if resp == nil {
+							return nil
+						}
+
+						rsp, err := t.arbitrage.Resolve(consts.Kucoin).Calculate(gCtx, *resp)
 
 						if err != nil {
 							return fmt.Errorf("calculate error: %v", err)
